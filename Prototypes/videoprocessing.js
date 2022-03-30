@@ -4,6 +4,8 @@ let functionQueue = {
     functions: [],
 };
 
+let possibleFunctions = ["threshold"];
+
 // global variables to hold the SIZE of the input
 var input_width = 320;
 var input_height = 240;
@@ -62,12 +64,32 @@ function doProcess(src_id, dest_id) {
     // Read image from the video stream
     var img = display_frame(src_id, dest_id);
 
-    // Series of if statements that further process the image
-    // if (document.getElementById('threshold').checked == true) {
-    //     cv.threshold(img, img, 128, 255, cv.THRESH_BINARY);
-    // }
+    for (let i = 0; i < functionQueue.numFunctions; i++) {
+        doProcessingStep(functionQueue.functions[i], img);
+    }
 
     // Show final image
     cv.imshow(dest_id, img);
     img.delete();
+}
+
+function addStep(funcName) {
+    functionQueue.numFunctions++;
+    functionQueue.functions.push(funcName);
+    console.log("Added", funcName);
+}
+
+function removeStep() {
+    if (functionQueue.numFunctions > 0) {
+        functionQueue.numFunctions--;
+        console.log("Removed:", functionQueue.functions.pop());
+    }
+}
+
+// Series of if statements find the right function and apply it to the image
+function doProcessingStep(funcName, img) {
+    if (funcName == "threshold") {
+        cv.threshold(img, img, 128, 255, cv.THRESH_BINARY);
+    }
+    // return img; // needed?
 }
