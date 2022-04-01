@@ -24,10 +24,7 @@
  */
 
 // Global object to track which order functions should run in
-let functionQueue = {
-    numFunctions: 0,
-    functions: [],
-};
+let functionQueue = [];
 
 // Global unique greyscale function because we can only have one
 let greyscale = { name: "greyscale", parameters: [] };
@@ -95,8 +92,8 @@ function doProcess(src_id, dest_id) {
     // Read image from the video stream
     var img = display_frame(src_id, dest_id);
 
-    for (let i = 0; i < functionQueue.numFunctions; i++) {
-        doProcessingStep(functionQueue.functions[i], img);
+    for (let i = 0; i < functionQueue.length; i++) {
+        doProcessingStep(functionQueue[i], img);
     }
 
     // Show final image
@@ -108,21 +105,18 @@ function doProcess(src_id, dest_id) {
 // Won't add greyscale twice
 function addStep(funcObject) {
     if (funcObject["name"] != "greyscale") {
-        functionQueue.numFunctions++;
-        functionQueue.functions.push(funcObject);
+        functionQueue.push(funcObject);
         console.log("Added", funcObject["name"]);
-    } else if (!functionQueue.functions.includes(greyscale)) {
-        functionQueue.numFunctions++;
-        functionQueue.functions.push(greyscale);
+    } else if (!functionQueue.includes(greyscale)) {
+        functionQueue.push(greyscale);
         console.log("Added", greyscale["name"]);
     }
 }
 
 // Removes step from function processing queue
 function removeStep() {
-    if (functionQueue.numFunctions > 0) {
-        functionQueue.numFunctions--;
-        console.log("Removed:", functionQueue.functions.pop()["name"]);
+    if (functionQueue.length > 0) {
+        console.log("Removed:", functionQueue.pop()["name"]);
     }
 }
 
