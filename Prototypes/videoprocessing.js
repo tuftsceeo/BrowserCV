@@ -37,6 +37,12 @@ var input_height = 240;
 var output_width = 320;
 var output_height = 240;
 
+/*
+ *
+ * Video & Repeated Sampling Functions
+ *
+ */
+
 // Function from Prof Danahy to start streaming video (chrome only?)
 function start_video(video_id) {
     var video_canvas = document.getElementById(video_id);
@@ -86,6 +92,12 @@ function repeatProcess(src_id, dest_id) {
     var tempo = document.getElementById("tempo").value;
     process = setInterval(doProcess, tempo, src_id, dest_id);
 }
+
+/*
+ *
+ * Video Processing Functions
+ *
+ */
 
 // Iterates through each processing step before showing final image
 function doProcess(src_id, dest_id) {
