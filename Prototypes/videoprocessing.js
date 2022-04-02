@@ -23,6 +23,7 @@
  * - how to use the page section
  */
 
+// Could turn back into JSON w/ https://stackoverflow.com/questions/736590/add-new-attribute-element-to-json-object-using-javascript to give it array-like properties maybe?
 // Global object to track which order functions should run in
 let functionQueue = [];
 
