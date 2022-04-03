@@ -23,17 +23,34 @@
  * - how to use the page section
  */
 
+// Template for all of our functions
+class CvFunction {
+    constructor(name, id, params, outputs, chngimg) {
+        this.name = name;
+        this.id = id;
+        this.params = params;
+        this.outputs = outputs;
+        // Boolean value if the function changes the image or not
+        this.chngimg = chngimg;
+    }
+}
+
 // Global object to track which order functions should run in
 class FunctionQueue {
     constructor() {
         this.length = 0;
         this.functions = {};
         this.includes_greyscale = false;
+        this.id_gen_seed = 0;
     }
 
     // Returns length of queue
     get len() {
         return this.length;
+    }
+
+    get funcs() {
+        return this.functions;
     }
 
     // Returns the function at a certain point in the queue
@@ -47,14 +64,23 @@ class FunctionQueue {
 
     // Add step to the function processing queue
     // Won't add greyscale twice
-    add(funcObject) {
-        if (funcObject["name"] != "greyscale") {
-            this.functions["func" + this.length] = funcObject;
+    add(name, params, outputs, chngimg) {
+        if (name != "greyscale") {
+            let temp = new CvFunction(
+                name,
+                "ID" + this.id_gen_seed,
+                params,
+                outputs,
+                chngimg
+            );
+            this.functions["func" + this.length] = temp;
             this.length++;
-            console.log("Added", funcObject["name"]);
+            this.id_gen_seed++;
+            console.log("Added", name);
         } else if (!functionQueue.includes_greyscale) {
             this.functions["func" + this.length] = greyscale;
             this.length++;
+            this.id_gen_seed++;
             this.includes_greyscale = true;
             console.log("Added", greyscale["name"]);
         }
@@ -75,7 +101,7 @@ class FunctionQueue {
 let functionQueue = new FunctionQueue();
 
 // Global unique greyscale function because we can only have one
-let greyscale = { name: "greyscale", parameters: [] };
+let greyscale = new CvFunction("greyscale", "IDgreyscale", [], [], true);
 
 // global variables to hold the SIZE of the input
 var input_width = 320;
@@ -163,7 +189,7 @@ function doProcess(src_id, dest_id) {
 
 // Removes step from function processing queue
 function removeStep() {
-    if (functionQueue.leng > 0) {
+    if (functionQueue.len > 0) {
         console.log("Removed:", functionQueue.pop()["name"]);
     }
 }
