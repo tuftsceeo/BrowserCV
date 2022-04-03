@@ -23,9 +23,56 @@
  * - how to use the page section
  */
 
-// Could turn back into JSON w/ https://stackoverflow.com/questions/736590/add-new-attribute-element-to-json-object-using-javascript to give it array-like properties maybe?
 // Global object to track which order functions should run in
-let functionQueue = [];
+class FunctionQueue {
+    constructor() {
+        this.length = 0;
+        this.functions = {};
+        this.includes_greyscale = false;
+    }
+
+    // Returns length of queue
+    get len() {
+        return this.length;
+    }
+
+    // Returns the function at a certain point in the queue
+    function_at(index) {
+        if ((index >= 0) & (index < this.length)) {
+            return this.functions["func" + index];
+        } else {
+            console.log("Please input valid index");
+        }
+    }
+
+    // Add step to the function processing queue
+    // Won't add greyscale twice
+    add(funcObject) {
+        if (funcObject["name"] != "greyscale") {
+            this.functions["func" + this.length] = funcObject;
+            this.length++;
+            console.log("Added", funcObject["name"]);
+        } else if (!functionQueue.includes_greyscale) {
+            this.functions["func" + this.length] = greyscale;
+            this.length++;
+            this.includes_greyscale = true;
+            console.log("Added", greyscale["name"]);
+        }
+    }
+
+    // Takes last function off queue and returns a copy of it
+    pop() {
+        // Creates deep copy
+        let temp = JSON.parse(
+            JSON.stringify(this.functions["func" + (this.length - 1)])
+        );
+        delete this.functions["func" + (this.length - 1)];
+        this.length--;
+        return temp;
+    }
+}
+
+let functionQueue = new FunctionQueue();
 
 // Global unique greyscale function because we can only have one
 let greyscale = { name: "greyscale", parameters: [] };
@@ -105,8 +152,8 @@ function doProcess(src_id, dest_id) {
     // Read image from the video stream
     var img = display_frame(src_id, dest_id);
 
-    for (let i = 0; i < functionQueue.length; i++) {
-        doProcessingStep(functionQueue[i], img);
+    for (let i = 0; i < functionQueue.len; i++) {
+        doProcessingStep(functionQueue.function_at(i), img);
     }
 
     // Show final image
@@ -114,21 +161,9 @@ function doProcess(src_id, dest_id) {
     img.delete();
 }
 
-// Add step to the function processing queue
-// Won't add greyscale twice
-function addStep(funcObject) {
-    if (funcObject["name"] != "greyscale") {
-        functionQueue.push(funcObject);
-        console.log("Added", funcObject["name"]);
-    } else if (!functionQueue.includes(greyscale)) {
-        functionQueue.push(greyscale);
-        console.log("Added", greyscale["name"]);
-    }
-}
-
 // Removes step from function processing queue
 function removeStep() {
-    if (functionQueue.length > 0) {
+    if (functionQueue.leng > 0) {
         console.log("Removed:", functionQueue.pop()["name"]);
     }
 }
