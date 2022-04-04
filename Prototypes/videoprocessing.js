@@ -23,6 +23,12 @@
  * - how to use the page section
  */
 
+/*
+ *
+ * Class Declarations
+ *
+ */
+
 // Template for all of our functions
 class CvFunction {
     constructor(name, id, params, outputs, chngimg) {
@@ -94,14 +100,28 @@ class FunctionQueue {
         );
         delete this.functions["func" + (this.length - 1)];
         this.length--;
+        if (temp.name == greyscale.name) {
+            this.includes_greyscale = false;
+        }
         return temp;
+    }
+
+    // Returns the function with the given ID
+    functionWithID(id) {
+        for (let i = 0; i < this.length; i++) {
+            let func = this.functions["func" + i];
+            if (func.id == id) {
+                return func;
+            }
+        }
+        console.log("No function found with id", id);
     }
 }
 
 let functionQueue = new FunctionQueue();
 
 // Global unique greyscale function because we can only have one
-let greyscale = new CvFunction("greyscale", "IDgreyscale", [], [], true);
+const greyscale = new CvFunction("greyscale", "IDgreyscale", {}, {}, true);
 
 // global variables to hold the SIZE of the input
 var input_width = 320;
@@ -169,6 +189,107 @@ function repeatProcess(src_id, dest_id) {
 
 /*
  *
+ * Show Queue Functions
+ *
+ */
+
+// Updates the visual queue with latest from functionQueue
+// Also runs scripts which enable page content to modify functionQueue
+function showQueue() {
+    let html = "";
+    let scripts = "";
+    for (let i = 0; i < functionQueue.len; i++) {
+        func = functionQueue.function_at(i);
+        if (func.name == "threshold") {
+            html += makeThresholdBlock(func);
+            scripts += makeThresholdScripts(func);
+        } else if (func.name == "greyscale") {
+            html += makeGreyscaleBlock(func);
+        }
+        html += "<br>";
+    }
+
+    // Removes all lingering scripts
+    let element = document.getElementById("queueScripts");
+    while (element.firstChild) {
+        element.removeChild(element.firstChild);
+    }
+
+    // Adds new html & scripts & runs them
+    let newScript = document.createElement("script");
+    newScript.innerHTML = scripts;
+    newScript.id = "ID" + functionQueue.id_gen_seed;
+    document.getElementById("visibleQueue").innerHTML = html;
+    document.getElementById("queueScripts").appendChild(newScript);
+}
+
+// Makes visual queue block for a threshold
+function makeThresholdBlock(func) {
+    let html = "<div id='" + func.id + "HTMLdiv" + "'><blockquote>";
+    html += "<p> ID: " + func.id + " Name: " + func.name + " </p>";
+    // Color picker
+    html += "<p> Color: </p>";
+
+    // Color value
+    html += '<input type="text" id="' + func.id + "color" + '"';
+    html +=
+        ' name="' + func.id + "color" + '" value="' + func.params.color + '">';
+    html +=
+        '<label for="' +
+        func.id +
+        "thresh" +
+        '"> Color: red, green, blue, or all </label><br>';
+
+    // Thresh value
+    html += '<input type="text" id="' + func.id + "thresh" + '"';
+    html +=
+        ' name="' +
+        func.id +
+        "thresh" +
+        '" value="' +
+        func.params.threshValue +
+        '">';
+    html += '<label for="' + func.id + "thresh" + '"> Threshold </label><br>';
+
+    html += "</p>";
+    html += "</blockquote></div>";
+    return html;
+}
+
+// Returns scripts that make a threshold block interactive
+function makeThresholdScripts(func) {
+    let script = "";
+
+    // Listener for change in threshold value
+    script += "var thresholdValue" + func.id + " = ";
+    script += 'document.getElementById("' + func.id + "thresh" + '"); ';
+    script += "thresholdValue" + func.id + ".oninput = function () {";
+    script += "functionQueue.functionWithID('" + func.id + "')";
+    script += ".params.threshValue = this.value";
+    script += ";}; ";
+
+    // Listener for change in color value
+    script += "var colorValue" + func.id + " = ";
+    script += 'document.getElementById("' + func.id + "color" + '");';
+    script += "colorValue" + func.id + ".oninput = function () {";
+    script += "functionQueue.functionWithID('" + func.id + "')";
+    script += ".params.color = this.value";
+    script += ";}; ";
+
+    return script;
+}
+
+// Returns HTML that make a greyscale block to show on queue
+function makeGreyscaleBlock(func) {
+    let html = "<div id='" + func.id + "HTMLdiv" + "'><blockquote>";
+    html += "<p> ID: " + func.id + " Name: " + func.name + " </p>";
+    html += "</p>";
+    html += "</blockquote></div>";
+    return html;
+}
+
+/*
+ *
  * Video Processing Functions
  *
  */
@@ -199,10 +320,60 @@ function doProcessingStep(funcObject, img) {
     funcName = funcObject["name"];
     switch (funcName) {
         case "threshold":
-            cv.threshold(img, img, 128, 255, cv.THRESH_BINARY);
+            doThreshold(funcObject, img);
             break;
         case "greyscale":
             cv.cvtColor(img, img, cv.COLOR_RGBA2GRAY);
             break;
+    }
+}
+
+/*
+ *
+ * OpenCV Implementations
+ *
+ */
+
+function doThreshold(funcObject, img) {
+    let color = funcObject.params.color;
+    let threshold = Number(funcObject.params.threshValue);
+    if (
+        color != "all" &&
+        color != "red" &&
+        color != "blue" &&
+        color != "green"
+    ) {
+        // console.log("incorrect color");
+        return;
+    }
+    if (color == "all") {
+        cv.threshold(img, img, threshold, 255, cv.THRESH_BINARY);
+    } else {
+        for (var i = 0; i < img.data.length; i += 4) {
+            var r = img.data[i]; // red
+            var g = img.data[i + 1]; // green
+            var b = img.data[i + 2]; // blue
+            var a = img.data[i + 3]; // alpha
+            if (color == "red" && r - g > threshold && r - b > threshold) {
+                // pixel is very red, so leave it
+            } else if (
+                color == "green" &&
+                g - r > threshold &&
+                g - b > threshold
+            ) {
+                // Pixel is very green so do nothing
+            } else if (
+                color == "blue" &&
+                b - r > threshold &&
+                b - g > threshold
+            ) {
+                // Pixel is very blue so do nothing
+            } else {
+                // pixel is NOT very much the color we want, so set to black
+                img.data[i] = 0;
+                img.data[i + 1] = 0;
+                img.data[i + 2] = 0;
+            }
+        }
     }
 }

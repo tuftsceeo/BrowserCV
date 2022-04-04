@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Built from work by Dr. Danahy <tufts.edu> -->
+        <!-- By Noah Stiegler and Rebecca Dinsmore -->
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>BrowserCV Prototype</title>
+
+        <!-- OpenCV.js -->
+        <script
+            type="text/javascript"
+            src="https://docs.opencv.org/master/opencv.js"
+        ></script>
+        <script type="text/javascript" src="videoprocessing.js"></script>
+
+        <!-- Bootstrap CSS -->
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+            crossorigin="anonymous"
+        />
+    </head>
+    <body>
+        <!-- Bootstrap JavaScript -->
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+            crossorigin="anonymous"
+        ></script>
+
+        <!-- General Bootstrap Container -->
+        <div class="center container-fluid">
+            <!-- Top Title -->
+            <div class="row text-center">
+                <h1>Computer Vision Code Generator</h1>
+            </div>
+
+            <br />
+
+            <!-- Display base image and all layers at top -->
+            <div class="row pb-3">
+                <div class="col col-sm-6">
+                    <div>
+                        <!-- Get Video Set Up-->
+                        <br />
+                        <br />
+                        <p>
+                            <button onclick="start_video('video');">
+                                Start Video
+                            </button>
+                        </p>
+                        <video
+                            id="video"
+                            autoplay
+                            style="border: black solid 1px"
+                        ></video>
+                    </div>
+                </div>
+                <div class="col">
+                    <!-- Sample Video and Apply Processing-->
+                    <p>
+                        <button onclick="repeatProcess('video', 'fin_dest');">
+                            Sample + Process
+                        </button>
+                        <button onclick="resetProcessing();">Stop</button>
+                    </p>
+                    <p>
+                        <input value="50" id="tempo" type="number" />
+                        <label for="tempo">&#60;-- Sample Rate</label>
+                    </p>
+                    <p>
+                        <canvas
+                            id="fin_dest"
+                            style="border: black solid 1px"
+                        ></canvas>
+                    </p>
+                </div>
+            </div>
+
+            <br />
+            <br />
+            <br />
+
+            <!-- Tools for managing function queue -->
+            <div class="row">
+                <!-- Threshold -->
+                <div class="col">
+                    <!-- TODO: Make this function have options -->
+                    <button
+                        onclick="functionQueue.add('threshold', {
+                            'threshValue': 100,
+                            'color': 'all'
+                        }, {}, true); showQueue();"
+                    >
+                        Add Threshold
+                    </button>
+                </div>
+
+                <!-- Greyscale -->
+                <div class="col">
+                    <button
+                        onclick="functionQueue.add('greyscale'); showQueue();"
+                    >
+                        Add Greyscale
+                    </button>
+                </div>
+
+                <!-- More room to add -->
+                <div class="col">
+                    <button onclick="">Other Later Function</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col"></div>
+                <div class="'col col-lg">
+                    <button class="" onclick="removeStep(); showQueue();">
+                        Remove Latest
+                    </button>
+                </div>
+                <div class="col"></div>
+            </div>
+
+            <br />
+            <br />
+            <br />
+
+            <!-- When a function block is added to queue
+                 its scripts are added here -->
+            <script id="queueScripts"></script>
+
+            <!-- Function Queue -->
+            <div class="row">
+                <div class="col"></div>
+                <div class="col">
+                    <div>
+                        <p>Queue:</p>
+                        <p id="visibleQueue"></p>
+                    </div>
+                </div>
+                <div class="col"></div>
+            </div>
+
+            <br />
+            <br />
+            <br />
+
+            <!-- Generating Code -->
+            <div class="row center">
+                <div class="col">
+                    <!-- Centering Hack -->
+                </div>
+                <div class="col">
+                    <p>
+                        <button onclick="generate_code(page_content);">
+                            Generate Code
+                        </button>
+                    </p>
+                    <p>
+                        <textarea
+                            id="output_code"
+                            cols="80"
+                            rows="20"
+                        ></textarea>
+                    </p>
+                </div>
+                <div class="col">
+                    <!-- Centering Hack -->
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
