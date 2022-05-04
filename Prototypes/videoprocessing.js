@@ -39,7 +39,7 @@
  *
  */
 
-// Template for all of our functions
+// Class holding info for Greyscale
 class Greyscale {
     constructor(id) {
         this.name = "greyscale";
@@ -60,14 +60,16 @@ class Greyscale {
     }
 }
 
+// Class holding info for Threshold
 class Threshold {
+    name = "threshold";
+    params = {
+        color: "all",
+        value: "100",
+    };
+
     constructor(id) {
-        this.name = "threshold";
         this.id = id;
-        this.params = {
-            color: "all",
-            value: "100",
-        };
     }
 
     get color() {
@@ -292,6 +294,7 @@ class FunctionQueue {
  *
  */
 
+// Set up functions
 let functionQueue = new FunctionQueue();
 let processingFunctions = ["threshold", "greyscale"];
 
