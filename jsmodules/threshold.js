@@ -22,6 +22,7 @@ function loadCode() {
             }
         }
         moduleCode = HTMLcode; // set this module's variable to the code
+        console.log(HTMLcode);
     };
     xhttp.open("GET", moduleCodePath, true);
     xhttp.send();
@@ -56,6 +57,7 @@ export function render(destinationElement, id) {
     let threshValueSelect = document.getElementById(id + "thresh");
     threshValueSelect.addEventListener("input", function () {
         functionQueue.functionWithID(id).params.value = this.value;
+        //document.getElementById(id + "threshValue").innerHTML = this.value;
     });
 }
 
@@ -79,8 +81,8 @@ class Threshold {
     }
 
     execute(img) {
-        let color = this.color;
-        let threshold = Number(this.value);
+        let color = this.params.color;
+        let threshold = Number(this.params.value);
         if (
             color != "all" &&
             color != "red" &&
