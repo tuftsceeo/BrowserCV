@@ -175,15 +175,17 @@ function addButton(ModulePointer) {
     buttonDiv.appendChild(button); // add button to page
 }
 
-processingFunctions.forEach(function (name) {
-    var path = "../jsmodules/" + name + ".js";
-    console.log("- about to load: " + name + " from " + path);
-    import(path).then((Module) => {
-        // once module loaded, what to do with it:
-        console.log("Module loaded: " + Module.moduleName);
-        addButton(Module);
+window.onload = function () {
+    processingFunctions.forEach(function (name) {
+        var path = "../jsmodules/" + name + ".js";
+        console.log("- about to load: " + name + " from " + path);
+        import(path).then((Module) => {
+            // once module loaded, what to do with it:
+            console.log("Module loaded: " + Module.moduleName);
+            addButton(Module);
+        });
     });
-});
+};
 
 // global variables to hold the SIZE of the input
 var input_width = 320;
