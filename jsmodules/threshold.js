@@ -57,7 +57,7 @@ export function render(destinationElement, id) {
     let threshValueSelect = document.getElementById(id + "thresh");
     threshValueSelect.addEventListener("input", function () {
         functionQueue.functionWithID(id).params.value = this.value;
-        //document.getElementById(id + "threshValue").innerHTML = this.value;
+        document.getElementById(id + "threshValue").innerHTML = this.value;
     });
 }
 
