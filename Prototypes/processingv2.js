@@ -1,16 +1,6 @@
 /**
- * TODO: Make functions classes
- * - Put classes in separate file as modules & export them
- *      - each class should have an .execute(), a .render(), a .showCode()
- * - Import classes from separate files (in folder) into main js file
- * - Have each module reference an html file (in html folder) that has html for
- *   the settings box for that class
- *
  * TODO: Improve functionality of FunctionQueue
  * - Swap two functions
- * - Delete function at index
- * - Insert function at index
- * -
  *
  * TODO: Do all the generating code stuff
  * - function that runs through queue and calls .showCode()
@@ -18,7 +8,6 @@
  * - have library of functions for copy/paste?
  *
  * TODO: Add more functions:
- * - Threshold: make RGB/All not text box, make value a slider
  * - a way to find objects in scene
  *   - contours
  *   - min enclosing circles within threshold min/max
@@ -26,121 +15,7 @@
  *   - positions of objects
  * - eventually code where user can do something if object is within an rect
  *
- * TODO: css & making the site look pretty
- * - Backgrounds to differentiate the sections
- * - Placement
- * - Buttons and images sized for visibility / accessibility
- * - how to use the page section
  */
-
-/*
- *
- * Class Declarations
- *
- */
-// Global object to track which order functions should run in
-class FunctionQueue {
-    constructor() {
-        this.length = 0;
-        this.functions = [];
-        this.includes_greyscale = false;
-        this.id_gen_seed = 0;
-    }
-
-    // Returns length of queue
-    get len() {
-        return this.length;
-    }
-
-    get funcs() {
-        return this.functions;
-    }
-
-    // Returns the function at a certain point in the queue
-    function_at(index) {
-        if ((index >= 0) & (index < this.length)) {
-            return this.functions[index];
-        } else {
-            console.log("Please input valid index");
-        }
-    }
-
-    // Add step to the function processing queue
-    // Won't add greyscale twice
-    add(modulePointer) {
-        // Checks if greyscale is already there
-        if (
-            modulePointer.moduleName == "greyscale" &&
-            this.includes_greyscale
-        ) {
-            console.log("Can't Greyscale more than once");
-            return;
-        }
-
-        let id = "ID" + this.id_gen_seed;
-        let temp = modulePointer.instance(id);
-
-        this.functions[this.length] = temp;
-        this.length++;
-        this.id_gen_seed++;
-        console.log("Added", modulePointer.moduleName);
-        return id;
-    }
-
-    indexWithID(id) {
-        for (let i = 0; i < this.length; i++) {
-            let func = this.functions[i];
-            if (func.id == id) {
-                return i;
-            }
-        }
-        console.log("No function found with id", id);
-    }
-
-    removeWithID(id) {
-        let index = this.indexWithID(id);
-        let temp = this.functions.splice(index, 1)[0];
-        this.length--;
-        if (temp.name == "greyscale") {
-            this.includes_greyscale = false;
-        }
-        let divToRemove = document.getElementById(id);
-        divToRemove.remove();
-        console.log("removed", temp["name"]);
-    }
-
-    // Takes last function off queue and returns a copy of it
-    pop() {
-        // Creates deep copy
-        let temp = this.functions.pop();
-        this.length--;
-        if (temp.name == "greyscale") {
-            this.includes_greyscale = false;
-        }
-        return temp;
-    }
-
-    // Removes step from function processing queue
-    removeStep() {
-        if (this.len > 0) {
-            let temp = this.pop();
-            let divToRemove = document.getElementById(temp["id"]);
-            divToRemove.remove();
-            console.log("Removed:", temp["name"]);
-        }
-    }
-
-    // Returns the function with the given ID
-    functionWithID(id) {
-        for (let i = 0; i < this.length; i++) {
-            let func = this.functions[i];
-            if (func.id == id) {
-                return func;
-            }
-        }
-        console.log("No function found with id", id);
-    }
-}
 
 /*
  *
@@ -149,7 +24,10 @@ class FunctionQueue {
  */
 
 // Set up functions
-let functionQueue = new FunctionQueue();
+var functionQueue;
+import("../jsmodules/functionqueue.js").then((Module) => {
+    functionQueue = Module.instance();
+});
 let processingFunctions = ["threshold", "greyscale"];
 
 function addButton(ModulePointer) {
