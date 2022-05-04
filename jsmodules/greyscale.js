@@ -27,8 +27,8 @@ function loadCode() {
             if (this.status == 404) {
                 HTMLcode = "Page not found.";
             }
+            moduleCode = HTMLcode; // set this module's variable to the code
         }
-        moduleCode = HTMLcode; // set this module's variable to the code
     };
     xhttp.open("GET", moduleCodePath, true);
     xhttp.send();
