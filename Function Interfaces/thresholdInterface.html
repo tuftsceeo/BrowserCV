@@ -1,0 +1,27 @@
+<blockquote>
+    <p>
+        ID: ${id}$ Name: ${name}$
+        <button onclick="functionQueue.removeWithID( '${id}$' );">X</button>
+    </p>
+    <label for="${id}$color"> Pick a color to Thresh: </label>
+    <select type="text" id="${id}$color" name="${id}$color" value="all">
+        <option value="all">all</option>
+        <option value="red">red</option>
+        <option value="green">green</option>
+        <option value="blue">blue</option>
+    </select>
+
+    <p>
+        <label for="${id}$thresh"> Threshold </label>
+    </p>
+    <input
+        type="range"
+        id="${id}$thresh"
+        name="${id}$thresh"
+        value="30"
+        min="0"
+        max="255"
+    />
+
+    <br />
+</blockquote>

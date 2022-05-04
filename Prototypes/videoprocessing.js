@@ -1,14 +1,24 @@
 /**
- * TODO: Show function queue on HTML page
- * - set innerHTML to show what's in the function queue object
+ * TODO: Make functions classes
+ * - Put classes in separate file as modules & export them
+ *      - each class should have an .execute(), a .render(), a .showCode()
+ * - Import classes from separate files (in folder) into main js file
+ * - Have each module reference an html file (in html folder) that has html for
+ *   the settings box for that class
+ *
+ * TODO: Improve functionality of FunctionQueue
+ * - Swap two functions
+ * - Delete function at index
+ * - Insert function at index
+ * -
  *
  * TODO: Do all the generating code stuff
- * - function that generates applies processing in order user queues
- * - function returns what it's supposed to
- * - et cetera
+ * - function that runs through queue and calls .showCode()
+ * - makes sure parameters etc. are linked up
+ * - have library of functions for copy/paste?
  *
  * TODO: Add more functions:
- * - a threshold you can choose color & value with a slider
+ * - Threshold: make RGB/All not text box, make value a slider
  * - a way to find objects in scene
  *   - contours
  *   - min enclosing circles within threshold min/max
@@ -23,17 +33,162 @@
  * - how to use the page section
  */
 
+/*
+ *
+ * Class Declarations
+ *
+ */
+
+// Class holding info for Greyscale
+class Greyscale {
+    constructor(id) {
+        this.name = "greyscale";
+        this.id = id;
+    }
+
+    execute(img) {
+        cv.cvtColor(img, img, cv.COLOR_RGBA2GRAY);
+    }
+
+    // Returns HTML that make a greyscale block to show on queue
+    renderHTML() {
+        let html = "<div id='" + this.id + "HTMLdiv" + "'><blockquote>";
+        html += "<p> ID: " + this.id + " Name: " + this.name + " </p>";
+        html += "</p>";
+        html += "</blockquote></div>";
+        return html;
+    }
+}
+
+// Class holding info for Threshold
+class Threshold {
+    name = "threshold";
+    params = {
+        color: "all",
+        value: "100",
+    };
+
+    constructor(id) {
+        this.id = id;
+    }
+
+    get color() {
+        return this.params.color;
+    }
+
+    get value() {
+        return this.params.value;
+    }
+
+    execute(img) {
+        let color = this.color;
+        let threshold = Number(this.value);
+        if (
+            color != "all" &&
+            color != "red" &&
+            color != "blue" &&
+            color != "green"
+        ) {
+            // console.log("incorrect color");
+            return;
+        }
+        if (color == "all") {
+            cv.threshold(img, img, threshold, 255, cv.THRESH_BINARY);
+        } else {
+            for (var i = 0; i < img.data.length; i += 4) {
+                var r = img.data[i]; // red
+                var g = img.data[i + 1]; // green
+                var b = img.data[i + 2]; // blue
+                var a = img.data[i + 3]; // alpha
+                if (color == "red" && r - g > threshold && r - b > threshold) {
+                    // pixel is very red, so leave it
+                } else if (
+                    color == "green" &&
+                    g - r > threshold &&
+                    g - b > threshold
+                ) {
+                    // Pixel is very green so do nothing
+                } else if (
+                    color == "blue" &&
+                    b - r > threshold &&
+                    b - g > threshold
+                ) {
+                    // Pixel is very blue so do nothing
+                } else {
+                    // pixel is NOT very much the color we want, so set to black
+                    img.data[i] = 0;
+                    img.data[i + 1] = 0;
+                    img.data[i + 2] = 0;
+                }
+            }
+        }
+    }
+
+    // TODO: sloppy way - xttp requests later. Just have .render()
+    renderHTML() {
+        let html = "<div id='" + this.id + "HTMLdiv" + "'><blockquote>";
+        html += "<p> ID: " + this.id + " Name: " + this.name + " </p>";
+
+        // Color value
+        html += '<input type="text" id="' + this.id + "color" + '"';
+        html += ' name="' + this.id + "color" + '" value="' + this.color + '">';
+        html +=
+            '<label for="' +
+            this.id +
+            "thresh" +
+            '"> Color: red, green, blue, or all </label><br>';
+
+        // Thresh value
+        html += '<input type="text" id="' + this.id + "thresh" + '"';
+        html +=
+            ' name="' + this.id + "thresh" + '" value="' + this.value + '">';
+        html +=
+            '<label for="' + this.id + "thresh" + '"> Threshold </label><br>';
+
+        html += "</p>";
+        html += "</blockquote></div>";
+        return html;
+    }
+
+    renderJS() {
+        let script = "";
+
+        // Listener for change in threshold value
+        script += "var thresholdValue" + this.id + " = ";
+        script += 'document.getElementById("' + this.id + "thresh" + '"); ';
+        script += "thresholdValue" + this.id + ".oninput = function () {";
+        script += "functionQueue.functionWithID('" + this.id + "')";
+        script += ".params.value = this.value";
+        script += ";}; ";
+
+        // Listener for change in color value
+        script += "var colorValue" + this.id + " = ";
+        script += 'document.getElementById("' + this.id + "color" + '");';
+        script += "colorValue" + this.id + ".oninput = function () {";
+        script += "functionQueue.functionWithID('" + this.id + "')";
+        script += ".params.color = this.value";
+        script += ";}; ";
+
+        return script;
+    }
+}
+
 // Global object to track which order functions should run in
 class FunctionQueue {
     constructor() {
         this.length = 0;
         this.functions = {};
         this.includes_greyscale = false;
+        this.id_gen_seed = 0;
     }
 
     // Returns length of queue
     get len() {
         return this.length;
+    }
+
+    get funcs() {
+        return this.functions;
     }
 
     // Returns the function at a certain point in the queue
@@ -47,17 +202,27 @@ class FunctionQueue {
 
     // Add step to the function processing queue
     // Won't add greyscale twice
-    add(funcObject) {
-        if (funcObject["name"] != "greyscale") {
-            this.functions["func" + this.length] = funcObject;
-            this.length++;
-            console.log("Added", funcObject["name"]);
-        } else if (!functionQueue.includes_greyscale) {
-            this.functions["func" + this.length] = greyscale;
-            this.length++;
-            this.includes_greyscale = true;
-            console.log("Added", greyscale["name"]);
+    add(name) {
+        let temp = {};
+        switch (name) {
+            case "threshold":
+                temp = new Threshold("ID" + this.id_gen_seed);
+                break;
+            case "greyscale":
+                if (!this.includes_greyscale) {
+                    temp = new Greyscale("ID" + this.id_gen_seed);
+                    this.includes_greyscale = true;
+                } else {
+                    console.log("Can't greyscale more than once");
+                    return;
+                }
+                break;
         }
+        this.functions["func" + this.length] = temp;
+        this.length++;
+        this.id_gen_seed++;
+        console.log("Added", name);
+        this.showQueue("visibleQueue", "queueScripts");
     }
 
     // Takes last function off queue and returns a copy of it
@@ -68,14 +233,70 @@ class FunctionQueue {
         );
         delete this.functions["func" + (this.length - 1)];
         this.length--;
+        if (temp.name == "greyscale") {
+            this.includes_greyscale = false;
+        }
+        this.showQueue("visibleQueue", "queueScripts");
         return temp;
+    }
+
+    // Removes step from function processing queue
+    removeStep() {
+        if (this.len > 0) {
+            console.log("Removed:", this.pop()["name"]);
+        }
+    }
+
+    // Returns the function with the given ID
+    functionWithID(id) {
+        for (let i = 0; i < this.length; i++) {
+            let func = this.functions["func" + i];
+            if (func.id == id) {
+                return func;
+            }
+        }
+        console.log("No function found with id", id);
+    }
+
+    //TODO: only takes html div, since scripts shouldn't be needed
+    // Updates the visual queue with latest from functionQueue
+    // Also runs scripts which enable page content to modify functionQueue
+    showQueue(htmlDivID, jsDivID) {
+        let html = "";
+        let scripts = "";
+        for (let i = 0; i < this.len; i++) {
+            let func = this.function_at(i);
+            html += func.renderHTML();
+            try {
+                scripts += func.renderJS();
+            } catch {}
+            html += "<br>";
+        }
+
+        // Removes all lingering scripts
+        let element = document.getElementById(jsDivID);
+        while (element.firstChild) {
+            element.removeChild(element.firstChild);
+        }
+
+        // Adds new html & scripts & runs them
+        let newScript = document.createElement("script");
+        newScript.innerHTML = scripts;
+        newScript.id = "ID" + functionQueue.id_gen_seed;
+        document.getElementById(htmlDivID).innerHTML = html;
+        document.getElementById(jsDivID).appendChild(newScript);
     }
 }
 
-let functionQueue = new FunctionQueue();
+/*
+ *
+ * Global Vars
+ *
+ */
 
-// Global unique greyscale function because we can only have one
-let greyscale = { name: "greyscale", parameters: [] };
+// Set up functions
+let functionQueue = new FunctionQueue();
+let processingFunctions = ["threshold", "greyscale"];
 
 // global variables to hold the SIZE of the input
 var input_width = 320;
@@ -141,19 +362,13 @@ function repeatProcess(src_id, dest_id) {
     process = setInterval(doProcess, tempo, src_id, dest_id);
 }
 
-/*
- *
- * Video Processing Functions
- *
- */
-
 // Iterates through each processing step before showing final image
 function doProcess(src_id, dest_id) {
     // Read image from the video stream
     var img = display_frame(src_id, dest_id);
 
     for (let i = 0; i < functionQueue.len; i++) {
-        doProcessingStep(functionQueue.function_at(i), img);
+        functionQueue.function_at(i).execute(img);
     }
 
     // Show final image
@@ -161,22 +376,22 @@ function doProcess(src_id, dest_id) {
     img.delete();
 }
 
-// Removes step from function processing queue
-function removeStep() {
-    if (functionQueue.leng > 0) {
-        console.log("Removed:", functionQueue.pop()["name"]);
-    }
-}
+/*
+ *
+ * Page Generating Functions
+ *
+ */
 
-// Finds the right processing step and executes it
-function doProcessingStep(funcObject, img) {
-    funcName = funcObject["name"];
-    switch (funcName) {
-        case "threshold":
-            cv.threshold(img, img, 128, 255, cv.THRESH_BINARY);
-            break;
-        case "greyscale":
-            cv.cvtColor(img, img, cv.COLOR_RGBA2GRAY);
-            break;
+function addButtons() {
+    console.log("adding buttons");
+    let buttonDiv = document.getElementById("buttons");
+    for (let i = 0; i < processingFunctions.length; i++) {
+        let func = processingFunctions[i];
+        let button = document.createElement("button");
+        button.innerHTML = func;
+        button.onclick = function () {
+            functionQueue.add(func);
+        };
+        buttonDiv.appendChild(button);
     }
 }
