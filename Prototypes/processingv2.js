@@ -30,7 +30,12 @@ import("../jsmodules/functionqueue.js").then((Module) => {
 });
 
 // List of functions that exist to import
-let processingFunctions = ["threshold", "greyscale", "findObjects"];
+let processingFunctions = [
+    "threshold",
+    "greyscale",
+    "findObjects",
+    "findColor",
+];
 
 // Generates button on page for a given function module
 function addButton(ModulePointer) {

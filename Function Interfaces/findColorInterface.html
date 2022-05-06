@@ -1,0 +1,86 @@
+<blockquote>
+    <p>
+        ID: ${id}$ Name: ${name}$
+        <button onclick="functionQueue.removeWithID( '${id}$' );">X</button>
+    </p>
+
+    <label for="${id}$color"> Pick a color to find: </label>
+    <select type="text" id="${id}$color" name="${id}$color" value="all">
+        <option value="red">red</option>
+        <option value="green">green</option>
+        <option value="blue">blue</option>
+    </select>
+
+    <p>
+        <label for="${id}$thresh">
+            How bright the object has to be to stand out
+        </label>
+    </p>
+    <input
+        type="range"
+        id="${id}$thresh"
+        name="${id}$thresh"
+        value="30"
+        min="0"
+        max="255"
+        style="width: 75%"
+    />
+    <span id="${id}$threshValue">30</span>
+
+    <p>
+        <label for="${id}$minsize"> Minimum Size of Enclosing Circle </label>
+    </p>
+    <input
+        type="range"
+        id="${id}$minsize"
+        name="${id}$minsize"
+        value="20"
+        min="0"
+        max="100"
+        style="width: 75%"
+    />
+    <span id="${id}$minsizeValue">20</span>
+
+    <p>
+        <label for="${id}$maxsize"> Maximum Size of Enclosing Circle </label>
+    </p>
+    <input
+        type="range"
+        id="${id}$maxsize"
+        name="${id}$maxsize"
+        value="40"
+        min="0"
+        max="100"
+        style="width: 75%"
+    />
+    <span id="${id}$maxsizeValue">40</span>
+
+    <p>
+        <label for="${id}$maxnum">
+            Maximum Number of Objects to Look For
+        </label>
+    </p>
+    <input
+        type="range"
+        id="${id}$maxnum"
+        name="${id}$maxnum"
+        value="4"
+        min="0"
+        max="10"
+        style="width: 75%"
+    />
+    <span id="${id}$maxnumValue">4</span>
+
+    <p>
+        <label for="${id}$visualize"> Visualize Circles </label>
+        <input
+            type="checkbox"
+            id="${id}$visualize"
+            name="${id}$visualize"
+            value="true"
+            checked
+        />
+    </p>
+
+    <br />
+</blockquote>
