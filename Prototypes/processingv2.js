@@ -3,17 +3,17 @@
  * - Swap two functions
  *
  * TODO: Do all the generating code stuff
+ * - Option for is_final_output?
  * - function that runs through queue and calls .showCode()
  * - makes sure parameters etc. are linked up
  * - have library of functions for copy/paste?
  *
  * TODO: Add more functions:
- * - a way to find objects in scene
- *   - contours
- *   - min enclosing circles within threshold min/max
- *   - # of objects
- *   - positions of objects
- * - eventually code where user can do something if object is within an rect
+ * - makebitmap (thresh all 0)
+ * - Find red, green, blue objects (adds pre-configured functions)
+ * - Something using the radius of an object to find its size
+ * - Location of object within 3x3 grid, passes back 1-9
+ * - Motional detection (subtracts one frame from another)
  *
  */
 
@@ -30,7 +30,7 @@ import("../jsmodules/functionqueue.js").then((Module) => {
 });
 
 // List of functions that exist to import
-let processingFunctions = ["threshold", "greyscale"];
+let processingFunctions = ["threshold", "greyscale", "locations"];
 
 // Generates button on page for a given function module
 function addButton(ModulePointer) {
@@ -126,12 +126,7 @@ function start_video(video_id) {
 function display_frame(src_canvas_id, dst_canvas_id) {
     // source canvas
     var src_canvas = document.getElementById(src_canvas_id);
-    // set size of destination:
-    var dst_canvas = document.getElementById(dst_canvas_id);
-    dst_canvas.setAttribute("width", output_width);
-    dst_canvas.setAttribute("height", output_height);
-    // create output canvas context
-    dst_canvas_context = dst_canvas.getContext("2d");
+
     // draw src onto dst
     // see: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage
     dst_canvas_context.drawImage(src_canvas, 0, 0, output_width, output_height);
@@ -149,7 +144,17 @@ function resetProcessing() {
 
 // Clears, then sets interval variable with function and interval timing
 function repeatProcess(src_id, dest_id) {
+    // Reset Interval
     resetProcessing();
+
+    // set size of destination:
+    var dst_canvas = document.getElementById(dest_id);
+    dst_canvas.setAttribute("width", output_width);
+    dst_canvas.setAttribute("height", output_height);
+
+    // create output canvas context
+    dst_canvas_context = dst_canvas.getContext("2d");
+
     var tempo = document.getElementById("tempo").value;
     process = setInterval(doProcess, tempo, src_id, dest_id);
 }

@@ -59,6 +59,7 @@ export function render(destinationElement, id) {
     colorSelect.addEventListener("input", function () {
         functionQueue.functionWithID(id).params.color = this.value;
     });
+
     // Threshold value listener
     let threshValueSelect = document.getElementById(id + "thresh");
     threshValueSelect.addEventListener("input", function () {
@@ -88,17 +89,10 @@ class Threshold {
     }
 
     execute(img) {
+        // Get values
         let color = this.params.color;
         let threshold = Number(this.params.value);
-        if (
-            color != "all" &&
-            color != "red" &&
-            color != "blue" &&
-            color != "green"
-        ) {
-            // console.log("incorrect color");
-            return;
-        }
+
         if (color == "all") {
             cv.threshold(img, img, threshold, 255, cv.THRESH_BINARY);
         } else {
