@@ -1,3 +1,7 @@
+// Module for FunctionQueue class which holds each processingFunction in order
+// Exports:
+// instance()
+
 // Global object to track which order functions should run in
 class FunctionQueue {
     constructor() {
@@ -12,6 +16,7 @@ class FunctionQueue {
         return this.length;
     }
 
+    // Returns functions Array
     get funcs() {
         return this.functions;
     }
@@ -37,9 +42,11 @@ class FunctionQueue {
             return;
         }
 
+        // Creates function
         let id = "ID" + this.id_gen_seed;
         let temp = modulePointer.instance(id);
 
+        // Adds function to queue
         this.functions[this.length] = temp;
         this.length++;
         this.id_gen_seed++;
@@ -47,6 +54,7 @@ class FunctionQueue {
         return id;
     }
 
+    // Finds index of function with certain id or logs that it wasn't found
     indexWithID(id) {
         for (let i = 0; i < this.length; i++) {
             let func = this.functions[i];
@@ -57,13 +65,20 @@ class FunctionQueue {
         console.log("No function found with id", id);
     }
 
+    // Removes function with id from the queue
+    // and removes its interface from page
     removeWithID(id) {
+        // Remove function from queue
         let index = this.indexWithID(id);
         let temp = this.functions.splice(index, 1)[0];
         this.length--;
+
+        // Updates includes_greyscale
         if (temp.name == "greyscale") {
             this.includes_greyscale = false;
         }
+
+        // Removes interface from html on page
         let divToRemove = document.getElementById(id);
         divToRemove.remove();
         console.log("removed", temp["name"]);
@@ -102,6 +117,7 @@ class FunctionQueue {
     }
 }
 
+// Returns new FunctionQueue
 export function instance() {
     return new FunctionQueue();
 }

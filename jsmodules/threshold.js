@@ -1,14 +1,18 @@
+// Module for Threshold processing function and related js functions
 // Exports:
 // moduleName
-// render(document.getelementbyID('target'))
-// instance(id) {return new Threshold(id)}
-//
+// render(destinationElement, id)
+// instance(id)
+// generateCode()
+
+// Identifier
 export let moduleName = "threshold";
 
 // internal variables:
 let moduleCodePath = "../Function Interfaces/thresholdInterface.html";
 let moduleCode = null;
 
+// Gets HTML from server for interface, puts it in moduleCode
 function loadCode() {
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
@@ -26,17 +30,17 @@ function loadCode() {
     xhttp.open("GET", moduleCodePath, true);
     xhttp.send();
 }
-// onload of module
+
+// onload of module, get moduleCode
 loadCode();
 
 // Sets innerHTML of destinationElement to this module's interface
 export function render(destinationElement, id) {
     let HTMLcode = moduleCode;
 
-    // Replaces ${string}$ with value at function[string] in the HTML
+    // Replaces ${string}$ in the HTML with value of function[string] in Queue
     const reg = /\${(\w+)}\$/gi;
     let match = HTMLcode.match(reg);
-
     if (Array.isArray(match)) {
         for (let i = 0; i < match.length; i++) {
             const newreg = /(\w+)(?=\}\$)/gi;
@@ -46,13 +50,16 @@ export function render(destinationElement, id) {
         }
     }
 
+    // Puts interface in destinationElement
     destinationElement.innerHTML = HTMLcode;
 
+    // Adds listeners to the inputs to change the function in functionQueue
+    // Color select listener
     let colorSelect = document.getElementById(id + "color");
     colorSelect.addEventListener("input", function () {
         functionQueue.functionWithID(id).params.color = this.value;
     });
-
+    // Threshold value listener
     let threshValueSelect = document.getElementById(id + "thresh");
     threshValueSelect.addEventListener("input", function () {
         functionQueue.functionWithID(id).params.value = this.value;
@@ -60,6 +67,7 @@ export function render(destinationElement, id) {
     });
 }
 
+// Class representing Threshold function that gets added to functionQueue
 class Threshold {
     name = "threshold";
     params = {
@@ -124,10 +132,12 @@ class Threshold {
     }
 }
 
+// Returns a new Threshold with id as the id
 export function instance(id) {
     return new Threshold(id);
 }
 
+// TODO:
 export function generateCode() {
     return "function " + moduleName + "() { }";
 }

@@ -23,13 +23,16 @@
  *
  */
 
-// Set up functions
+// Set up functionQueue
 var functionQueue;
 import("../jsmodules/functionqueue.js").then((Module) => {
     functionQueue = Module.instance();
 });
+
+// List of functions that exist to import
 let processingFunctions = ["threshold", "greyscale"];
 
+// Generates button on page for a given function module
 function addButton(ModulePointer) {
     // destination div
     let buttonDiv = document.getElementById("buttons");
@@ -37,13 +40,15 @@ function addButton(ModulePointer) {
     let button = document.createElement("button");
     button.id = ModulePointer.moduleName;
     button.innerHTML = "Add " + ModulePointer.moduleName;
+
+    // Adds function to functionQueue when clicked & generates interface
     button.addEventListener("click", () => {
         // add to functionQueue
         let id = functionQueue.add(ModulePointer);
         if (!id) {
             return;
         }
-        // render element
+        // render interface
         let newDiv = document.createElement("div");
         newDiv.id = id;
         newDiv.classList.add("section"); // add class "section" for styling
@@ -53,13 +58,33 @@ function addButton(ModulePointer) {
     buttonDiv.appendChild(button); // add button to page
 }
 
+// Makes sure all imported modules have the values and functions they need
+function checkModuleContents(Module, name) {
+    if (
+        typeof Module.moduleName !== "string" &&
+        !(Module.moduleName instanceof String)
+    ) {
+        console.log("Module Name Doesn't Exist for", name);
+    } else if (typeof Module.render !== "function") {
+        console.log("Render() doesn't exist for", name);
+    } else if (typeof Module.instance !== "function") {
+        console.log("Instance() doesn't exist for", name);
+    } else if (typeof Module.generateCode !== "function") {
+        console.log("generateCode() doesn't exist for", name);
+    }
+}
+
+// Import all the functions from their modules
 window.onload = function () {
     processingFunctions.forEach(function (name) {
         var path = "../jsmodules/" + name + ".js";
         console.log("- about to load: " + name + " from " + path);
         import(path).then((Module) => {
-            // once module loaded, what to do with it:
+            // Makes sure module has the exports I need
+            checkModuleContents(Module, name);
             console.log("Module loaded: " + Module.moduleName);
+
+            // Adds "add function" button to page
             addButton(Module);
         });
     });
@@ -79,7 +104,7 @@ var output_height = 240;
  *
  */
 
-// Function from Prof Danahy to start streaming video (chrome only?)
+// Function from Prof. Danahy to start streaming video (chrome only?)
 function start_video(video_id) {
     var video_canvas = document.getElementById(video_id);
     // Set the width and height:
@@ -97,7 +122,7 @@ function start_video(video_id) {
     }
 }
 
-// takes video data and displays on a canvas, also can return frame as img
+// Takes video data and displays on a canvas, also can return frame as img
 function display_frame(src_canvas_id, dst_canvas_id) {
     // source canvas
     var src_canvas = document.getElementById(src_canvas_id);
@@ -122,7 +147,7 @@ function resetProcessing() {
     clearInterval(process);
 }
 
-// Sets interval variable with function and interval timing
+// Clears, then sets interval variable with function and interval timing
 function repeatProcess(src_id, dest_id) {
     resetProcessing();
     var tempo = document.getElementById("tempo").value;
