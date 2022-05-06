@@ -76,8 +76,14 @@ class Threshold {
         value: "100",
     };
 
-    constructor(id) {
-        this.id = id;
+    constructor(argmap) {
+        this.id = argmap.id;
+        if ("color" in argmap) {
+            this.params.color = argmap.color;
+        }
+        if ("value" in argmap) {
+            this.params.value = argmap.value;
+        }
     }
 
     get color() {
@@ -127,8 +133,8 @@ class Threshold {
 }
 
 // Returns a new Threshold with id as the id
-export function instance(id) {
-    return new Threshold(id);
+export function instance(argmap) {
+    return new Threshold(argmap);
 }
 
 // TODO:

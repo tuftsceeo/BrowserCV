@@ -94,8 +94,20 @@ class FindObjects {
         coords: [],
     };
 
-    constructor(id) {
-        this.id = id;
+    constructor(argmap) {
+        this.id = argmap.id;
+        if ("minsize" in argmap) {
+            this.minsize = argmap.minsize;
+        }
+        if ("maxsize" in argmap) {
+            this.maxsize = argmap.maxsize;
+        }
+        if ("maxnum" in argmap) {
+            this.maxnum = argmap.maxnum;
+        }
+        if ("visualize" in argmap) {
+            this.visualize = argmap.visualize;
+        }
     }
 
     get outputs() {
@@ -214,8 +226,8 @@ class FindObjects {
 }
 
 // Returns a new findObjects with id as the id
-export function instance(id) {
-    return new FindObjects(id);
+export function instance(argmap) {
+    return new FindObjects(argmap);
 }
 
 // TODO:

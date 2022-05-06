@@ -56,9 +56,9 @@ export function render(destinationElement, id) {
 
 // Class holding info for Greyscale
 class Greyscale {
-    constructor(id) {
+    constructor(argmap) {
         this.name = "greyscale";
-        this.id = id;
+        this.id = argmap.id;
     }
 
     execute(img) {
@@ -67,9 +67,9 @@ class Greyscale {
 }
 
 // Returns a new Greyscale with id of id
-export function instance(id) {
+export function instance(argmap) {
     functionQueue.includes_greyscale = true;
-    return new Greyscale(id);
+    return new Greyscale(argmap);
 }
 
 // TODO:

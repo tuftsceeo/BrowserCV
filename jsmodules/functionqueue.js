@@ -43,15 +43,15 @@ class FunctionQueue {
         }
 
         // Creates function
-        let id = "ID" + this.id_gen_seed;
-        let temp = modulePointer.instance(id);
+        let idval = "ID" + this.id_gen_seed;
+        let temp = modulePointer.instance({ id: idval });
 
         // Adds function to queue
         this.functions[this.length] = temp;
         this.length++;
         this.id_gen_seed++;
         console.log("Added", modulePointer.moduleName);
-        return id;
+        return idval;
     }
 
     // Finds index of function with certain id or logs that it wasn't found
