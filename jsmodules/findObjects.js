@@ -1,4 +1,4 @@
-// Module for locations processing function and related js functions
+// Module for findObjects processing function and related js functions
 // Exports:
 // moduleName
 // render(destinationElement, id)
@@ -6,10 +6,10 @@
 // generateCode()
 
 // Identifier
-export let moduleName = "locations";
+export let moduleName = "find objects";
 
 // internal variables:
-let moduleCodePath = "../Function Interfaces/locationsInterface.html";
+let moduleCodePath = "../Function Interfaces/findObjectsInterface.html";
 let moduleCode = null;
 
 // Gets HTML from server for interface, puts it in moduleCode
@@ -80,9 +80,9 @@ export function render(destinationElement, id) {
     });
 }
 
-// Class representing Locations function that gets added to functionQueue
-class Locations {
-    name = "locations";
+// Class representing findObjects function that gets added to functionQueue
+class FindObjects {
+    name = "findObjects";
     params = {
         // Minimum & Maximum enclosing circle size
         minsize: 20,
@@ -213,9 +213,9 @@ class Locations {
     }
 }
 
-// Returns a new Locations with id as the id
+// Returns a new findObjects with id as the id
 export function instance(id) {
-    return new Locations(id);
+    return new FindObjects(id);
 }
 
 // TODO:
