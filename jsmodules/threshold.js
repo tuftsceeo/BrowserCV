@@ -99,7 +99,18 @@ class Threshold {
         let color = this.params.color;
         let threshold = Number(this.params.value);
 
-        if (color == "all") {
+        if (color == "all" || functionQueue.includes_greyscale) {
+            // Test with adaptive thresholding
+            // cv.adaptiveThreshold(
+            //     img,
+            //     img,
+            //     255,
+            //     cv.ADAPTIVE_THRESH_GAUSSIAN_C,
+            //     cv.THRESH_BINARY,
+            //     11,
+            //     threshold
+            // );
+            // use cv.THRESH_TOZERO to keep image normal but set dim pixels to be black
             cv.threshold(img, img, threshold, 255, cv.THRESH_BINARY);
         } else {
             for (var i = 0; i < img.data.length; i += 4) {

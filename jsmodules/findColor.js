@@ -188,14 +188,17 @@ class FindColor {
             for (let i = 0; i < circles.length; i++) {
                 let circle = circles[i];
                 this.outputs.coords.push(circle.center);
+            }
 
-                // Visualize where contours are
-                if (this.params.visualize) {
-                    // Makes the image a color image so we can draw on it
-                    cv.cvtColor(img, img, cv.COLOR_GRAY2RGBA);
+            // Visualize where contours are
+            if (this.params.visualize) {
+                // Makes the image a color image so we can draw on it
+                cv.cvtColor(img, img, cv.COLOR_GRAY2RGBA);
 
-                    //draws circle and center
-                    let yellow_color = new cv.Scalar(255, 255, 0, 255);
+                //draws circle and center
+                let yellow_color = new cv.Scalar(255, 255, 0, 255);
+                circles.forEach(function (circle) {
+                    // Draws circle
                     cv.circle(
                         img,
                         circle.center,
@@ -220,9 +223,11 @@ class FindColor {
                         2,
                         cv.LINE_AA
                     );
-                }
+                });
             }
-        } catch (error) {}
+        } catch (error) {
+            console.log("Error with findObjects.execute:", error);
+        }
     }
 
     // Finds max_objects number of minimum enclosing cirlces around objects

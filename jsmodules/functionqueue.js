@@ -32,6 +32,7 @@ class FunctionQueue {
 
     // Add step to the function processing queue
     // Won't add greyscale twice
+    // Won't add findObjects unless image is greyscaled
     add(modulePointer) {
         // Checks if greyscale is already there
         if (
@@ -42,12 +43,21 @@ class FunctionQueue {
             return;
         }
 
+        // Checks that image is greyscaled before adding findObjects
+        if (
+            modulePointer.moduleName == "find objects" &&
+            !this.includes_greyscale
+        ) {
+            console.log("Find Objects doesn't work unless image is greyscale");
+            return;
+        }
+
         // Creates function
         let idval = "ID" + this.id_gen_seed;
-        let temp = modulePointer.instance({ id: idval });
+        let to_add = modulePointer.instance({ id: idval });
 
         // Adds function to queue
-        this.functions[this.length] = temp;
+        this.functions.push(to_add);
         this.length++;
         this.id_gen_seed++;
         console.log("Added", modulePointer.moduleName);

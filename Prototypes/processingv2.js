@@ -10,7 +10,6 @@
  *
  * TODO: Add more functions:
  * - makebitmap (thresh all 0)
- * - Find red, green, blue objects (adds pre-configured functions)
  * - Something using the radius of an object to find its size
  * - Location of object within 3x3 grid, passes back 1-9
  * - Motional detection (subtracts one frame from another)
@@ -25,7 +24,7 @@
 
 // Set up functionQueue
 var functionQueue;
-import("../jsmodules/functionqueue.js").then((Module) => {
+import("../jsmodules/functionQueue.js").then((Module) => {
     functionQueue = Module.instance();
 });
 
