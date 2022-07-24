@@ -5,53 +5,23 @@
 // instance(id)
 // generateCode()
 
+// Imports
+import threshold from "./onImageActions/thresholdAction.js"; // for execute
+import loadCode from "./moduleSetup/loadCode.js"; // for module setup
+import displayInterface from "./moduleSetup/displayInterface.js"; // for module setup
+
 // Identifier
 export let moduleName = "threshold";
 
-// internal variables:
-let moduleCodePath = "../Function Interfaces/thresholdInterface.html";
-let moduleCode = null;
-
-// Gets HTML from server for interface, puts it in moduleCode
-function loadCode() {
-    let xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function () {
-        let HTMLcode = ""; // empty
-        if (this.readyState == 4) {
-            if (this.status == 200) {
-                HTMLcode = this.responseText;
-            }
-            if (this.status == 404) {
-                HTMLcode = "Page not found.";
-            }
-            moduleCode = HTMLcode; // set this module's variable to the code
-        }
-    };
-    xhttp.open("GET", moduleCodePath, true);
-    xhttp.send();
-}
-
 // onload of module, get moduleCode
-loadCode();
+let moduleCodePath = "../Function Interfaces/thresholdInterface.html";
+let moduleCode = { contents: null };
+loadCode(moduleCodePath, moduleCode);
 
 // Sets innerHTML of destinationElement to this module's interface
 export function render(destinationElement, id) {
-    let HTMLcode = moduleCode;
-
-    // Replaces ${string}$ in the HTML with value of function[string] in Queue
-    const reg = /\${(\w+)}\$/gi;
-    let match = HTMLcode.match(reg);
-    if (Array.isArray(match)) {
-        for (let i = 0; i < match.length; i++) {
-            const newreg = /(\w+)(?=\}\$)/gi;
-            let submatch =
-                functionQueue.functionWithID(id)[match[i].match(newreg)];
-            HTMLcode = HTMLcode.replace(match[i], submatch);
-        }
-    }
-
-    // Puts interface in destinationElement
-    destinationElement.innerHTML = HTMLcode;
+    // Puts function interface HTML on page
+    displayInterface(destinationElement, id, moduleCode.contents);
 
     // Adds listeners to the inputs to change the function in functionQueue
     // Color select listener
@@ -97,49 +67,10 @@ class Threshold {
     execute(img) {
         // Get values
         let color = this.params.color;
-        let threshold = Number(this.params.value);
+        let thresh = Number(this.params.value);
 
-        if (color == "all" || functionQueue.includes_greyscale) {
-            // Test with adaptive thresholding
-            // cv.adaptiveThreshold(
-            //     img,
-            //     img,
-            //     255,
-            //     cv.ADAPTIVE_THRESH_GAUSSIAN_C,
-            //     cv.THRESH_BINARY,
-            //     11,
-            //     threshold
-            // );
-            // use cv.THRESH_TOZERO to keep image normal but set dim pixels to be black
-            cv.threshold(img, img, threshold, 255, cv.THRESH_BINARY);
-        } else {
-            for (var i = 0; i < img.data.length; i += 4) {
-                var r = img.data[i]; // red
-                var g = img.data[i + 1]; // green
-                var b = img.data[i + 2]; // blue
-                var a = img.data[i + 3]; // alpha
-                if (color == "red" && r - g > threshold && r - b > threshold) {
-                    // pixel is very red, so leave it
-                } else if (
-                    color == "green" &&
-                    g - r > threshold &&
-                    g - b > threshold
-                ) {
-                    // Pixel is very green so do nothing
-                } else if (
-                    color == "blue" &&
-                    b - r > threshold &&
-                    b - g > threshold
-                ) {
-                    // Pixel is very blue so do nothing
-                } else {
-                    // pixel is NOT very much the color we want, so set to black
-                    img.data[i] = 0;
-                    img.data[i + 1] = 0;
-                    img.data[i + 2] = 0;
-                }
-            }
-        }
+        // Perform thresholding
+        threshold(img, color, thresh);
     }
 }
 

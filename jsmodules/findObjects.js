@@ -5,53 +5,25 @@
 // instance(id)
 // generateCode()
 
+// Imports
+import circleObjects from "./onImageActions/circleObjectsAction.js"; // for execute
+import drawCircles from "./onImageActions/drawCirclesAction.js"; // for execute
+import loadCode from "./moduleSetup/loadCode.js"; // for module setup
+import displayInterface from "./moduleSetup/displayInterface.js"; // for module setup
+
 // Identifier
 export let moduleName = "find objects";
 
 // internal variables:
 let moduleCodePath = "../Function Interfaces/findObjectsInterface.html";
-let moduleCode = null;
-
-// Gets HTML from server for interface, puts it in moduleCode
-function loadCode() {
-    let xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function () {
-        let HTMLcode = ""; // empty
-        if (this.readyState == 4) {
-            if (this.status == 200) {
-                HTMLcode = this.responseText;
-            }
-            if (this.status == 404) {
-                HTMLcode = "Page not found.";
-            }
-            moduleCode = HTMLcode; // set this module's variable to the code
-        }
-    };
-    xhttp.open("GET", moduleCodePath, true);
-    xhttp.send();
-}
-
 // onload of module, get moduleCode
-loadCode();
+let moduleCode = { contents: null };
+loadCode(moduleCodePath, moduleCode);
 
 // Sets innerHTML of destinationElement to this module's interface
 export function render(destinationElement, id) {
-    let HTMLcode = moduleCode;
-
-    // Replaces ${string}$ in the HTML with value of function[string] in Queue
-    const reg = /\${(\w+)}\$/gi;
-    let match = HTMLcode.match(reg);
-    if (Array.isArray(match)) {
-        for (let i = 0; i < match.length; i++) {
-            const newreg = /(\w+)(?=\}\$)/gi;
-            let submatch =
-                functionQueue.functionWithID(id)[match[i].match(newreg)];
-            HTMLcode = HTMLcode.replace(match[i], submatch);
-        }
-    }
-
-    // Puts interface in destinationElement
-    destinationElement.innerHTML = HTMLcode;
+    // Puts function interface HTML on page
+    displayInterface(destinationElement, id, moduleCode.contents);
 
     // Adds listeners to the inputs to change the function in functionQueue
     // Minimum enclosing circle size listener
@@ -136,7 +108,7 @@ class FindObjects {
 
         try {
             // Get contours around objects
-            let circles = this.#find_objects(
+            let circles = circleObjects(
                 img,
                 this.maxnum,
                 this.minsize,
@@ -152,81 +124,11 @@ class FindObjects {
 
             // Visualize where contours are
             if (this.params.visualize) {
-                // Makes the image a color image so we can draw on it
-                cv.cvtColor(img, img, cv.COLOR_GRAY2RGBA);
-
-                //draws circle and center
-                let yellow_color = new cv.Scalar(255, 255, 0, 255);
-                circles.forEach(function (circle) {
-                    // Draws circle
-                    cv.circle(
-                        img,
-                        circle.center,
-                        circle.radius,
-                        yellow_color,
-                        2
-                    );
-                    cv.circle(img, circle.center, 1, yellow_color, 1);
-
-                    // Draws radius
-                    let font = cv.FONT_HERSHEY_SIMPLEX;
-                    cv.putText(
-                        img,
-                        Math.round(circle.radius).toString(),
-                        {
-                            x: circle.center.x - circle.radius,
-                            y: circle.center.y + circle.radius,
-                        },
-                        font,
-                        0.5,
-                        yellow_color,
-                        2,
-                        cv.LINE_AA
-                    );
-                });
+                drawCircles(img, circles);
             }
         } catch (error) {
-            console.log("Error with findObjects.execute:", error);
+            console.log("Error with find objects.execute:", error);
         }
-    }
-
-    // Finds max_objects number of minimum enclosing cirlces around objects
-    // with radii between min_size and max_size
-    #find_objects(img_in, max_objects, min_size, max_size) {
-        // setup
-        let contours = new cv.MatVector();
-        let hierarchy = new cv.Mat();
-        let contour_list = []; // tmp empty array for holding list
-
-        // find contours
-        cv.findContours(
-            img_in,
-            contours,
-            hierarchy,
-            cv.RETR_CCOMP,
-            cv.CHAIN_APPROX_SIMPLE
-        );
-
-        // go through contours
-        if (contours.size() > 0) {
-            for (let i = 0; i < contours.size(); i++) {
-                // check size
-                var circle = cv.minEnclosingCircle(contours.get(i));
-                if (circle.radius >= min_size && circle.radius <= max_size) {
-                    // push object into our array
-                    contour_list.push(circle);
-                }
-            }
-            // sort results, biggest to smallest
-            // code via: https://flaviocopes.com/how-to-sort-array-of-objects-by-property-javascript/
-            contour_list.sort((a, b) => (a.radius > b.radius ? -1 : 1));
-        } else {
-            // NO CONTOURS FOUND
-            //console.log('NO CONTOURS FOUND');
-        }
-
-        // return, from sorted list, those that match
-        return contour_list.slice(0, max_objects); // return the biggest ones
     }
 }
 
