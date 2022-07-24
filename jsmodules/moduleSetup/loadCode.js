@@ -10,21 +10,3 @@ export default async function loadCode(url, moduleCode) {
             moduleCode.contents = content;
         });
 }
-
-// function loadCode(moduleCodePath, callback) {
-//     let xhttp = new XMLHttpRequest();
-//     xhttp.onreadystatechange = function () {
-//         let HTMLcode = ""; // empty
-//         if (this.readyState == 4) {
-//             if (this.status == 200) {
-//                 HTMLcode = this.responseText;
-//             }
-//             if (this.status == 404) {
-//                 HTMLcode = "Page not found.";
-//             }
-//             callback = HTMLcode; // set this module's variable to the code
-//         }
-//     };
-//     xhttp.open("GET", moduleCodePath, true);
-//     xhttp.send();
-// }
