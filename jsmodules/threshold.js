@@ -6,9 +6,8 @@
 // generateCode()
 
 // Imports
-import threshold from "./onImageActions/thresholdAction.js"; // for execute
-import loadCode from "./moduleSetup/loadCode.js"; // for module setup
-import displayInterface from "./moduleSetup/displayInterface.js"; // for module setup
+import * as act from "./onImageActions/actions.js"; // for execute
+import * as mh from "./moduleSetup/moduleHelper.js"; // for module setup
 
 // Identifier
 export let moduleName = "threshold";
@@ -16,12 +15,12 @@ export let moduleName = "threshold";
 // onload of module, get moduleCode
 let moduleCodePath = "../Function Interfaces/thresholdInterface.html";
 let moduleCode = { contents: null };
-loadCode(moduleCodePath, moduleCode);
+mh.loadCode(moduleCodePath, moduleCode);
 
 // Sets innerHTML of destinationElement to this module's interface
 export function render(destinationElement, id) {
     // Puts function interface HTML on page
-    displayInterface(destinationElement, id, moduleCode.contents);
+    mh.displayInterface(destinationElement, id, moduleCode.contents);
 
     // Adds listeners to the inputs to change the function in functionQueue
     // Color select listener
@@ -70,7 +69,7 @@ class Threshold {
         let thresh = Number(this.params.value);
 
         // Perform thresholding
-        threshold(img, color, thresh);
+        act.threshold(img, color, thresh);
     }
 }
 

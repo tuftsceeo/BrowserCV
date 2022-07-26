@@ -6,11 +6,8 @@
 // generateCode()
 
 // Imports
-import circleObjects from "./onImageActions/circleObjectsAction.js"; // for execute
-import drawCircles from "./onImageActions/drawCirclesAction.js"; // for execute
-import threshold from "./onImageActions/thresholdAction.js"; // for execute
-import loadCode from "./moduleSetup/loadCode.js"; // for module setup
-import displayInterface from "./moduleSetup/displayInterface.js"; // for module setup
+import * as act from "./onImageActions/actions.js"; // for execute
+import * as mh from "./moduleSetup/moduleHelper.js"; // for module setup
 
 // Identifier
 export let moduleName = "find color";
@@ -19,12 +16,12 @@ export let moduleName = "find color";
 let moduleCodePath = "../Function Interfaces/findColorInterface.html";
 // onload of module, get moduleCode
 let moduleCode = { contents: null };
-loadCode(moduleCodePath, moduleCode);
+mh.loadCode(moduleCodePath, moduleCode);
 
 // Sets innerHTML of destinationElement to this module's interface
 export function render(destinationElement, id) {
     // Puts function interface HTML on page
-    displayInterface(destinationElement, id, moduleCode.contents);
+    mh.displayInterface(destinationElement, id, moduleCode.contents);
 
     // Adds listeners to the inputs to change the function in functionQueue
     // Minimum enclosing circle size listener
@@ -133,7 +130,7 @@ class FindColor {
 
     execute(img) {
         // Threshold the image to the given brightness and color
-        threshold(img, this.color, this.brightness);
+        act.threshold(img, this.color, this.brightness);
 
         // Binary the image (Greyscale it then thresh again)
         try {
@@ -149,7 +146,7 @@ class FindColor {
 
         try {
             // Get contours around objects
-            let circles = circleObjects(
+            let circles = act.circleObjects(
                 img,
                 this.maxnum,
                 this.minsize,
@@ -165,7 +162,7 @@ class FindColor {
 
             // Visualize where contours are
             if (this.params.visualize) {
-                drawCircles(img, circles);
+                act.drawCircles(img, circles);
             }
         } catch (error) {
             console.log("Error with find color:", error);

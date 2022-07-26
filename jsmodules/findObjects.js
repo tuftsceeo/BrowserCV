@@ -6,10 +6,8 @@
 // generateCode()
 
 // Imports
-import circleObjects from "./onImageActions/circleObjectsAction.js"; // for execute
-import drawCircles from "./onImageActions/drawCirclesAction.js"; // for execute
-import loadCode from "./moduleSetup/loadCode.js"; // for module setup
-import displayInterface from "./moduleSetup/displayInterface.js"; // for module setup
+import * as act from "./onImageActions/actions.js"; // for execute
+import * as mh from "./moduleSetup/moduleHelper.js"; // for module setup
 
 // Identifier
 export let moduleName = "find objects";
@@ -18,12 +16,12 @@ export let moduleName = "find objects";
 let moduleCodePath = "../Function Interfaces/findObjectsInterface.html";
 // onload of module, get moduleCode
 let moduleCode = { contents: null };
-loadCode(moduleCodePath, moduleCode);
+mh.loadCode(moduleCodePath, moduleCode);
 
 // Sets innerHTML of destinationElement to this module's interface
 export function render(destinationElement, id) {
     // Puts function interface HTML on page
-    displayInterface(destinationElement, id, moduleCode.contents);
+    mh.displayInterface(destinationElement, id, moduleCode.contents);
 
     // Adds listeners to the inputs to change the function in functionQueue
     // Minimum enclosing circle size listener
@@ -108,7 +106,7 @@ class FindObjects {
 
         try {
             // Get contours around objects
-            let circles = circleObjects(
+            let circles = act.circleObjects(
                 img,
                 this.maxnum,
                 this.minsize,
@@ -124,7 +122,7 @@ class FindObjects {
 
             // Visualize where contours are
             if (this.params.visualize) {
-                drawCircles(img, circles);
+                act.drawCircles(img, circles);
             }
         } catch (error) {
             console.log("Error with find objects.execute:", error);

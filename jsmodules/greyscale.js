@@ -6,9 +6,8 @@
 // generateCode()
 
 // Imports
-import greyscale from "./onImageActions/greyscaleAction.js"; // for execute
-import loadCode from "./moduleSetup/loadCode.js"; // for module setup
-import displayInterface from "./moduleSetup/displayInterface.js"; // for module setup
+import * as act from "./onImageActions/actions.js"; // for execute
+import * as mh from "./moduleSetup/moduleHelper.js"; // for module setup
 
 // Identifier
 export let moduleName = "greyscale";
@@ -17,12 +16,12 @@ export let moduleName = "greyscale";
 let moduleCodePath = "../Function Interfaces/greyscaleInterface.html";
 // onload of module, get moduleCode
 let moduleCode = { contents: null };
-loadCode(moduleCodePath, moduleCode);
+mh.loadCode(moduleCodePath, moduleCode);
 
 // Sets innerHTML of destinationElement to this module's interface
 export function render(destinationElement, id) {
     // Puts function interface HTML on page
-    displayInterface(destinationElement, id, moduleCode.contents);
+    mh.displayInterface(destinationElement, id, moduleCode.contents);
 }
 
 // Class holding info for Greyscale
@@ -34,7 +33,7 @@ class Greyscale {
 
     execute(img) {
         //cv.cvtColor(img, img, cv.COLOR_RGBA2GRAY);
-        greyscale(img);
+        act.greyscale(img);
     }
 }
 
