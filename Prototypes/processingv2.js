@@ -18,9 +18,17 @@
 
 /*
  *
- * Global Vars
+ * Global Vars and Importing Global Functions
  *
  */
+
+// global variables to hold the SIZE of the input
+var input_width = 320;
+var input_height = 240;
+
+// global variables to hold the SIZE of the output
+var output_width = 320;
+var output_height = 240;
 
 // Get helper function
 let codeLine;
@@ -41,6 +49,15 @@ let processingFunctions = [
     "findObjects",
     "findColor",
 ];
+
+// Used in internal testing of the generateCode function. Paste generateCode function into console then set to true via console to see what generateCode function is doing
+let test = false;
+
+/*
+ *
+ * Page Setup
+ *
+ */
 
 // Generates button on page for a given function module
 function addButton(ModulePointer) {
@@ -82,7 +99,7 @@ function checkModuleContents(Module, name) {
     }
 }
 
-// Import all the functions from their modules
+// Import all the functions from their modules and add buttons to page
 window.onload = function () {
     processingFunctions.forEach(function (name) {
         var path = "../jsmodules/" + name + ".js";
@@ -97,14 +114,6 @@ window.onload = function () {
         });
     });
 };
-
-// global variables to hold the SIZE of the input
-var input_width = 320;
-var input_height = 240;
-
-// global variables to hold the SIZE of the output
-var output_width = 320;
-var output_height = 240;
 
 /*
  *
@@ -172,14 +181,27 @@ function doProcess(src_id, dest_id) {
     // Read image from the video stream
     var img = display_frame(src_id, dest_id);
 
-    for (let i = 0; i < functionQueue.len; i++) {
-        functionQueue.function_at(i).execute(img);
+    // For debugging generateCode
+    if (test) {
+        // Do predefined function on img
+        console.log(processImage(img));
+    } else {
+        // Let user change functions applied to img
+        for (let i = 0; i < functionQueue.len; i++) {
+            functionQueue.function_at(i).execute(img);
+        }
     }
 
     // Show final image
     cv.imshow(dest_id, img);
     img.delete();
 }
+
+/*
+ *
+ * Generate code for user
+ *
+ */
 
 function generateCode(functionQueue, dest_id) {
     // Setup
@@ -202,7 +224,12 @@ function generateCode(functionQueue, dest_id) {
         });
 
         // Insert each function's code into the boilerplate
-        code += `// Takes in variable containing openCV image and modifies it
+        code += `// Needs accompanying HTML to function:
+/*<script
+\ttype="text/javascript"
+\tsrc="https://docs.opencv.org/master/opencv.js"
+></script>*/
+// Takes in variable containing openCV image and modifies it
 // Returns any function outputs (such as coordinates of objects)
 function processImage(img) { 
 \t// Collects outputs to return
