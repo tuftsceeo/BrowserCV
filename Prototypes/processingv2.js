@@ -22,6 +22,12 @@
  *
  */
 
+// Get helper function
+let codeLine;
+import("../jsmodules/moduleSetup/moduleHelper.js").then((mh) => {
+    codeLine = mh.codeLine;
+});
+
 // Set up functionQueue
 var functionQueue;
 import("../jsmodules/functionQueue.js").then((Module) => {
@@ -73,8 +79,6 @@ function checkModuleContents(Module, name) {
         console.log("Render() doesn't exist for", name);
     } else if (typeof Module.instance !== "function") {
         console.log("Instance() doesn't exist for", name);
-    } else if (typeof Module.generateCode !== "function") {
-        console.log("generateCode() doesn't exist for", name);
     }
 }
 
@@ -133,6 +137,9 @@ function display_frame(src_canvas_id, dst_canvas_id) {
 
     // draw src onto dst
     // see: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage
+    // create output canvas context
+    let dst_canvas = document.getElementById(dst_canvas_id);
+    let dst_canvas_context = dst_canvas.getContext("2d");
     dst_canvas_context.drawImage(src_canvas, 0, 0, output_width, output_height);
     // return the image data
     return cv.imread(dst_canvas_id);
@@ -156,9 +163,6 @@ function repeatProcess(src_id, dest_id) {
     dst_canvas.setAttribute("width", output_width);
     dst_canvas.setAttribute("height", output_height);
 
-    // create output canvas context
-    dst_canvas_context = dst_canvas.getContext("2d");
-
     var tempo = document.getElementById("tempo").value;
     process = setInterval(doProcess, tempo, src_id, dest_id);
 }
@@ -175,4 +179,40 @@ function doProcess(src_id, dest_id) {
     // Show final image
     cv.imshow(dest_id, img);
     img.delete();
+}
+
+function generateCode(functionQueue, dest_id) {
+    // Setup
+    const dest = document.getElementById(dest_id);
+    const language = "javaScript"; // TODO: can be selectable later
+    let code = "";
+
+    // Fill out code with functions
+    if (language == "javaScript") {
+        let subCode = "";
+
+        // Iterate through functionQueue getting code for each function
+        functionQueue.funcs.forEach(function (func) {
+            console.log(`Writing code for ${func.id}: ${func.name}`);
+            subCode += "\n";
+            subCode += codeLine(
+                `// Code for function: ${func.name} ID: ${func.id}`
+            );
+            subCode += func.generateCode(func, language);
+        });
+
+        // Insert each function's code into the boilerplate
+        code += `// Takes in variable containing openCV image and modifies it
+// Returns any function outputs (such as coordinates of objects)
+function processImage(img) { 
+\t// Collects outputs to return
+\tlet outputs = {}; 
+${subCode}
+\t// Return outputs of sub functions
+\treturn outputs;
+};`;
+    }
+
+    // Write code on page
+    dest.value = code;
 }

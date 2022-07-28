@@ -35,15 +35,24 @@ class Greyscale {
         //cv.cvtColor(img, img, cv.COLOR_RGBA2GRAY);
         act.greyscale(img);
     }
+
+    generateCode(func, language) {
+        // Setup
+        let code = "";
+
+        // Check for language
+        if (language == "javaScript") {
+            // Copy functionality from actions.js replacing variables with user's options
+            code += codeLine(`cv.cvtColor(img, img, cv.COLOR_RGBA2GRAY);`);
+        }
+
+        // Send code to generator
+        return code;
+    }
 }
 
 // Returns a new Greyscale with id of id
 export function instance(argmap) {
     functionQueue.includes_greyscale = true;
     return new Greyscale(argmap);
-}
-
-// TODO:
-export function generateCode() {
-    return "function " + moduleName + "() { }";
 }

@@ -3,7 +3,7 @@
         ID: ${id}$ Name: ${name}$
         <button onclick="functionQueue.removeWithID( '${id}$' );">X</button>
     </p>
-    <p>Note: works when image is first greyscaled then thresholded</p>
+    <p>Note: Works best when image is first greyscaled then thresholded</p>
     <p>
         <label for="${id}$minsize"> Minimum Size of Enclosing Circle </label>
     </p>
@@ -57,6 +57,9 @@
             value="true"
             checked
         />
+    </p>
+    <p>
+        <b>Outputs: Coordinates of found objects</b>
     </p>
 
     <br />

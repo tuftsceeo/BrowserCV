@@ -28,3 +28,8 @@ export function displayInterface(destinationElement, id, HTMLcode) {
     // Puts interface in destinationElement
     destinationElement.innerHTML = HTMLcode;
 }
+
+// Formats a line of code for generateCode functions
+export function codeLine(code) {
+    return `\t${code}\n`;
+}
