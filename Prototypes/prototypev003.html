@@ -8,6 +8,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
         <title>BrowserCV Prototype</title>
+        <link rel="icon" type="image/x-icon" href="/favicon.ico">
 
         <!-- OpenCV.js -->
         <script
@@ -145,6 +146,11 @@
                         <button onclick="generateCode(functionQueue, 'output_code');">
                             Generate Code
                         </button>
+                        <label for="${id}$color"> Language </label>
+                        <select type="text" id="generateCodeLanguage" value="JavaScript">
+                            <option value="JavaScript">JavaScript</option>
+                            <option value="Python">Python</option>
+                        </select>
                     </p>
                     <p>
                         <textarea

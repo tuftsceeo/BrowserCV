@@ -168,14 +168,73 @@ class FindColor {
             console.log("Error with find color:", error);
         }
     }
+
+    // TODO:
+    generateCode(language) {
+        // Setup
+        let code = "";
+
+        if (language == "JavaScript") {
+            const lines = [
+                `// Threshold the image to the given brightness and color`,
+                `thresholdHelper(img, "${this.color}", ${this.brightness}, ${functionQueue.includes_greyscale});`,
+                ``,
+                `// Binary the image (Greyscale it then thresh again)`,
+                `try {`,
+                `    cv.cvtColor(img, img, cv.COLOR_RGBA2GRAY);`,
+                `} catch (error) {`,
+                `    cv.cvtColor(img, img, cv.COLOR_GRAY2RGBA);`,
+                `    cv.cvtColor(img, img, cv.COLOR_RGBA2GRAY);`,
+                `}`,
+                `cv.threshold(img, img, 0, 255, cv.THRESH_BINARY);`,
+                ``,
+                `// Reset output coords`,
+                `outputs.${this.id} = [];`,
+                ``,
+                `try {`,
+                `    // Get contours around objects`,
+                `    let circles${this.id} = circleObjectsHelper(`,
+                `        img,`,
+                `        ${this.maxnum},`,
+                `        ${this.minsize},`,
+                `        ${this.maxsize}`,
+                `    );`,
+                ``,
+                `    // For each contour, put its center in outputs`,
+                `    for (let i = 0; i < circles${this.id}.length; i++) {`,
+                `        let circle = circles${this.id}[i];`,
+                `        outputs.${this.id}.push(circle.center);`,
+                `    }`,
+                ``,
+                `    // Visualize where contours are`,
+                `    if (${this.params.visualize}) {`,
+                `        drawCirclesHelper(img, circles${this.id});`,
+                `    }`,
+                `} catch (error) {`,
+                `    console.log("Error with find color:", error);`,
+                `}`,
+            ];
+            lines.forEach((line) => {
+                code += mh.codeLine(line);
+            });
+        } else {
+            // TODO: Add more languages
+            throw `Language: ${language} not currently supported`;
+        }
+
+        return {
+            code: code,
+            helperNames: [
+                "threshold",
+                "greyscale",
+                "circleObjects",
+                "drawCircles",
+            ],
+        };
+    }
 }
 
 // Returns a new findColor with id as the id
 export function instance(argmap) {
     return new FindColor(argmap);
-}
-
-// TODO:
-export function generateCode() {
-    return "function " + moduleName + "() { }";
 }

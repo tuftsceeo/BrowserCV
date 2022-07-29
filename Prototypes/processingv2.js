@@ -30,10 +30,13 @@ var input_height = 240;
 var output_width = 320;
 var output_height = 240;
 
-// Get helper function
-let codeLine;
+// Get helper functions
+let codeLine, generateCode;
 import("../jsmodules/moduleSetup/moduleHelper.js").then((mh) => {
     codeLine = mh.codeLine;
+});
+import("../jsmodules/generateCode/generateCode.js").then((gc) => {
+    generateCode = gc.generateCode;
 });
 
 // Set up functionQueue
@@ -73,7 +76,7 @@ function addButton(ModulePointer) {
         // add to functionQueue
         let id = functionQueue.add(ModulePointer);
         if (!id) {
-            return;
+            throw `Error adding ${ModulePointer.moduleName}, functionQueue.add didn't return an ID`;
         }
         // render interface
         let newDiv = document.createElement("div");
@@ -195,51 +198,4 @@ function doProcess(src_id, dest_id) {
     // Show final image
     cv.imshow(dest_id, img);
     img.delete();
-}
-
-/*
- *
- * Generate code for user
- *
- */
-
-function generateCode(functionQueue, dest_id) {
-    // Setup
-    const dest = document.getElementById(dest_id);
-    const language = "javaScript"; // TODO: can be selectable later
-    let code = "";
-
-    // Fill out code with functions
-    if (language == "javaScript") {
-        let subCode = "";
-
-        // Iterate through functionQueue getting code for each function
-        functionQueue.funcs.forEach(function (func) {
-            console.log(`Writing code for ${func.id}: ${func.name}`);
-            subCode += "\n";
-            subCode += codeLine(
-                `// Code for function: ${func.name} ID: ${func.id}`
-            );
-            subCode += func.generateCode(func, language);
-        });
-
-        // Insert each function's code into the boilerplate
-        code += `// Needs accompanying HTML to function:
-/*<script
-\ttype="text/javascript"
-\tsrc="https://docs.opencv.org/master/opencv.js"
-></script>*/
-// Takes in variable containing openCV image and modifies it
-// Returns any function outputs (such as coordinates of objects)
-function processImage(img) { 
-\t// Collects outputs to return
-\tlet outputs = {}; 
-${subCode}
-\t// Return outputs of sub functions
-\treturn outputs;
-};`;
-    }
-
-    // Write code on page
-    dest.value = code;
 }

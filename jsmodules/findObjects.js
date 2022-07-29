@@ -130,86 +130,34 @@ class FindObjects {
     }
 
     // TODO: Find way to put helper functions in generateCode functions (maybe pass which helper functions it needs back to the main one, which includes one copy of each of the helper functions above the main function definition?)
-    generateCode(func, language) {
+    generateCode(language) {
         // Setup
         let code = "";
 
         // Check for language
-        if (language == "javaScript") {
+        if (language == "JavaScript") {
             // Copy functionality from actions.js replacing variables with user's options
 
-            code += codeLine(`outputs.${func.id} = []`);
+            code += mh.codeLine(`outputs.${this.id} = []`);
             code += `\ttry {
 \t\t// Get contours around objects
-\t\tlet contours${func.id} = new cv.MatVector();
-\t\tlet hierarchy${func.id} = new cv.Mat();
-\t\tlet contour_list${func.id} = []; // tmp empty array for holding list
-
-\t\t// find contours
-\t\tcv.findContours(
+\t\tlet circles${this.id} = circleObjectsHelper(
 \t\t\timg,
-\t\t\tcontours${func.id},
-\t\t\thierarchy${func.id},
-\t\t\tcv.RETR_CCOMP,
-\t\t\tcv.CHAIN_APPROX_SIMPLE
+\t\t\t${this.maxnum},
+\t\t\t${this.minsize},
+\t\t\t${this.maxsize}
 \t\t);
-
-\t\t// go through contours
-\t\tif (contours${func.id}.size() > 0) {
-\t\t\tfor (let i = 0; i < contours${func.id}.size(); i++) {
-\t\t\t\t// check size
-\t\t\t\tvar circle${func.id} = cv.minEnclosingCircle(contours${func.id}.get(i));
-\t\t\t\tif (circle${func.id}.radius >= ${func.minsize} && circle${func.id}.radius <= ${func.maxsize}) {
-\t\t\t\t\t// push object into our array
-\t\t\t\t\tcontour_list${func.id}.push(circle${func.id});
-\t\t\t\t}
-\t\t\t}
-\t\t\t// sort results, biggest to smallest
-\t\t\t// code via: https://flaviocopes.com/how-to-sort-array-of-objects-by-property-javascript/
-\t\t\tcontour_list${func.id}.sort((a, b) => (a.radius > b.radius ? -1 : 1));
-\t\t} else {
-\t\t\t// NO CONTOURS FOUND
-\t\t\t//console.log('NO CONTOURS FOUND');
-\t\t}
-
-\t\t// take, from sorted list, those that match our max number of objects
-\t\tcircles${func.id} = contour_list${func.id}.slice(0, ${func.maxnum}); // return the biggest ones
 
 \t\t// For each contour, put its center as the coords of an object in
 \t\t// the outputs.coords array
-\t\tfor (let i = 0; i < circles${func.id}.length; i++) {
-\t\t\tlet circle = circles${func.id}[i];
-\t\t\toutputs.${func.id}.push(circle.center);
+\t\tfor (let i = 0; i < circles${this.id}.length; i++) {
+\t\t\tlet circle = circles${this.id}[i];
+\t\t\toutputs.${this.id}.push(circle.center);
 \t\t}
 
 \t\t// Visualize where contours are
-\t\tif (${func.params.visualize}) {
-\t\t\t// Makes the image a color image so we can draw on it
-\t\t\tcv.cvtColor(img, img, cv.COLOR_GRAY2RGBA);
-\t\t\t
-\t\t\t//draws circle and center
-\t\t\tlet yellow_color${func.id} = new cv.Scalar(255, 255, 0, 255);
-\t\t\tcircles${func.id}.forEach(function (circle) {
-\t\t\t\t// Draws circle
-\t\t\t\tcv.circle(img, circle.center, circle.radius, yellow_color${func.id}, 2);
-\t\t\t\tcv.circle(img, circle.center, 1, yellow_color${func.id}, 1);
-
-\t\t\t\t// Draws radius
-\t\t\t\tlet font${func.id} = cv.FONT_HERSHEY_SIMPLEX;
-\t\t\t\tcv.putText(
-\t\t\t\t\timg,
-\t\t\t\t\tMath.round(circle.radius).toString(),
-\t\t\t\t\t{
-\t\t\t\t\t\tx: circle.center.x - circle.radius,
-\t\t\t\t\t\ty: circle.center.y + circle.radius,
-\t\t\t\t\t},
-\t\t\t\t\tfont${func.id},
-\t\t\t\t\t0.5,
-\t\t\t\t\tyellow_color${func.id},
-\t\t\t\t\t2,
-\t\t\t\t\tcv.LINE_AA
-\t\t\t\t);
-\t\t\t});
+\t\tif (${this.params.visualize}) {
+\t\t\tdrawCirclesHelper(img, circles${this.id})
 \t\t}
 \t} catch (error) {
 \t\tconsole.log("Error with find objects.execute:", error);
@@ -217,7 +165,15 @@ class FindObjects {
         }
 
         // Send code to generator
-        return code;
+        return {
+            code: code,
+            helperNames: [
+                "threshold",
+                "greyscale",
+                "circleObjects",
+                "drawCircles",
+            ],
+        };
     }
 }
 

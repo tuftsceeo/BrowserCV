@@ -36,18 +36,21 @@ class Greyscale {
         act.greyscale(img);
     }
 
-    generateCode(func, language) {
+    generateCode(language) {
         // Setup
         let code = "";
 
         // Check for language
-        if (language == "javaScript") {
+        if (language == "JavaScript") {
             // Copy functionality from actions.js replacing variables with user's options
-            code += codeLine(`cv.cvtColor(img, img, cv.COLOR_RGBA2GRAY);`);
+            code += mh.codeLine("greyscaleHelper(img);");
+        } else {
+            // TODO: Add other language support
+            throw `ERROR: Language ${language} isn't supported yet`;
         }
 
         // Send code to generator
-        return code;
+        return { code: code, helperNames: ["greyscale"] };
     }
 }
 
