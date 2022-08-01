@@ -70,13 +70,13 @@
                     <!-- Sample Video and Apply Processing-->
                     <p>
                         <button onclick="repeatProcess('video', 'fin_dest');">
-                            Sample + Process
+                            Start Processing
                         </button>
                         <button onclick="resetProcessing();">Stop</button>
                     </p>
                     <p>
                         <input value="50" id="tempo" type="number" />
-                        <label for="tempo">Sample Rate (lower for better performance)</label>
+                        <label for="tempo">Sample Interval (raise for better performance)</label>
                     </p>
                     <p>
                         <canvas
@@ -143,14 +143,17 @@
                 </div>
                 <div class="col">
                     <p>
-                        <button onclick="generateCode(functionQueue, 'output_code');">
-                            Generate Code
-                        </button>
-                        <label for="${id}$color"> Language </label>
-                        <select type="text" id="generateCodeLanguage" value="JavaScript">
-                            <option value="JavaScript">JavaScript</option>
-                            <option value="Python">Python</option>
-                        </select>
+                        <div id="generateCodeButtons">
+                            <button onclick="generateCode(functionQueue, 'output_code');">
+                                Generate Code
+                            </button>
+                            <label for="generateCodeLanguage"> Language </label>
+                            <select type="text" id="generateCodeLanguage" value="JavaScript">
+                                <option value="JavaScript">JavaScript</option>
+                                <option value="Python">Python</option>
+                            </select>
+                            <button id="output_copy" onclick="copyToClip('output_code', 'output_copy', 'generateCodeButtons');">Copy</button>
+                        </div>
                     </p>
                     <p>
                         <textarea

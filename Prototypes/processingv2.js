@@ -1,12 +1,9 @@
 /**
+ * TODO: Bugs
+ * - Greyscale + Threshold functionality (threshold is currently changing behavior even if greyscale is after it in the queue)
+ *
  * TODO: Improve functionality of FunctionQueue
  * - Swap two functions
- *
- * TODO: Do all the generating code stuff
- * - Option for is_final_output?
- * - function that runs through queue and calls .showCode()
- * - makes sure parameters etc. are linked up
- * - have library of functions for copy/paste?
  *
  * TODO: Add more functions:
  * - makebitmap (thresh all 0)
@@ -31,9 +28,10 @@ var output_width = 320;
 var output_height = 240;
 
 // Get helper functions
-let codeLine, generateCode;
+let codeLine, generateCode, copyToClip;
 import("../jsmodules/moduleSetup/moduleHelper.js").then((mh) => {
     codeLine = mh.codeLine;
+    copyToClip = mh.copyToClip;
 });
 import("../jsmodules/generateCode/generateCode.js").then((gc) => {
     generateCode = gc.generateCode;
@@ -104,6 +102,7 @@ function checkModuleContents(Module, name) {
 
 // Import all the functions from their modules and add buttons to page
 window.onload = function () {
+    // Load all our processing functions
     processingFunctions.forEach(function (name) {
         var path = "../jsmodules/" + name + ".js";
         console.log("- about to load: " + name + " from " + path);
@@ -116,6 +115,19 @@ window.onload = function () {
             addButton(Module);
         });
     });
+
+    // Add listener for changing video sample rate
+    let sampleRateTextBox = document.getElementById("tempo");
+    if (sampleRateTextBox) {
+        sampleRateTextBox.addEventListener("input", () => {
+            repeatProcess("video", "fin_dest");
+        });
+    } else {
+        throw `Trying to get DOM of sample rate text box before page loads`;
+    }
+
+    start_video("video");
+    repeatProcess("video", "fin_dest");
 };
 
 /*
