@@ -1,6 +1,6 @@
 /**
  * TODO: Bugs
- * - Threshold for color is suuper slow
+ * - Memory leak crashes browser when findcolor is open too long
  *
  * TODO: Improve functionality of FunctionQueue
  * - Swap two functions
@@ -15,6 +15,8 @@
  * - python
  *
  */
+
+"use strict";
 
 /*
  *
@@ -169,7 +171,7 @@ function repeatProcess(video_id, dest_id) {
         cap.read(img);
 
         // Run processing on frame
-        doProcess(img, dest_id);
+        doProcess(img);
 
         // Display frame
         cv.imshow(dest_id, img);
@@ -192,7 +194,7 @@ function repeatProcess(video_id, dest_id) {
 }
 
 // Iterates through each processing step before showing final image
-function doProcess(img, dest_id) {
+function doProcess(img) {
     // For debugging generateCode
     if (test) {
         // Do predefined function on img

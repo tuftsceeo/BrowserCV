@@ -132,49 +132,30 @@ class FindColor {
         // Threshold the image to the given brightness and color
         act.threshold(img, this.color, "binary", this.brightness);
 
-        // Binary the image (Greyscale it then thresh again)
-        try {
-            cv.cvtColor(img, img, cv.COLOR_RGBA2GRAY);
-        } catch (error) {
-            cv.cvtColor(img, img, cv.COLOR_GRAY2RGBA);
-            cv.cvtColor(img, img, cv.COLOR_RGBA2GRAY);
-        }
-        cv.threshold(img, img, 0, 255, cv.THRESH_BINARY);
-
         // Reset output coords
         this.outputs.coords.length = 0;
 
-        let circles;
-        try {
-            // Get contours around objects
-            circles = act.circleObjects(
-                img,
-                this.maxnum,
-                this.minsize,
-                this.maxsize
-            );
-        } catch (error) {
-            console.log(`Error with circleObjects ` + error);
+        // Get contours around objects
+        let circles = act.circleObjects(
+            img,
+            this.maxnum,
+            this.minsize,
+            this.maxsize
+        );
+
+        // For each contour, put its center as the coords of an object in
+        // the outputs.coords array
+        for (let i = 0; i < circles.length; i++) {
+            let circle = circles[i];
+            this.outputs.coords.push(circle.center);
         }
 
-        try {
-            // For each contour, put its center as the coords of an object in
-            // the outputs.coords array
-            for (let i = 0; i < circles.length; i++) {
-                let circle = circles[i];
-                this.outputs.coords.push(circle.center);
-            }
-
-            // Visualize where contours are
-            if (this.params.visualize) {
-                act.drawCircles(img, circles);
-            }
-        } catch (error) {
-            console.log("Error with drawCircles:", error);
+        // Visualize where contours are
+        if (this.params.visualize) {
+            act.drawCircles(img, circles);
         }
     }
 
-    // TODO:
     generateCode(language) {
         // Setup
         let code = "";
@@ -182,17 +163,8 @@ class FindColor {
         if (language == "JavaScript") {
             const lines = [
                 `// Threshold the image to the given brightness and color`,
-                `thresholdHelper(img, "${this.color}", ${this.brightness});`,
-                ``,
-                `// Binary the image (Greyscale it then thresh again)`,
-                `try {`,
-                `    cv.cvtColor(img, img, cv.COLOR_RGBA2GRAY);`,
-                `} catch (error) {`,
-                `    cv.cvtColor(img, img, cv.COLOR_GRAY2RGBA);`,
-                `    cv.cvtColor(img, img, cv.COLOR_RGBA2GRAY);`,
-                `}`,
-                `cv.threshold(img, img, 0, 255, cv.THRESH_BINARY);`,
-                ``,
+                `thresholdHelper(img, "${this.color}", "binary",${this.brightness});`,
+                "",
                 `// Reset output coords`,
                 `outputs.${this.id} = [];`,
                 ``,
@@ -223,7 +195,6 @@ class FindColor {
                 code += mh.codeLine(line);
             });
         } else {
-            // TODO: Add more languages
             throw `Language: ${language} not currently supported`;
         }
 

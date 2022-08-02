@@ -245,14 +245,11 @@ function circleObjectsHelper(language) {
 \t\t// sort results, biggest to smallest
 \t\t// code via: https://flaviocopes.com/how-to-sort-array-of-objects-by-property-javascript/
 \t\tcontour_list.sort((a, b) => (a.radius > b.radius ? -1 : 1));
-\t} else {
-\t\t// NO CONTOURS FOUND
-\t\t//console.log('NO CONTOURS FOUND');
 \t}
 
-// clean up
-contours.delete();
-hierarchy.delete();
+\t// clean up
+\tcontours.delete();
+\thierarchy.delete();
         
 \t// return, from sorted list, those that match
 \treturn contour_list.slice(0, max_objects); // return the biggest ones

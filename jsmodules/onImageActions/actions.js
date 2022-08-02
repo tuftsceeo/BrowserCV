@@ -66,40 +66,28 @@ export function circleObjects(img_in, max_objects, min_size, max_size) {
     let contour_list = []; // tmp empty array for holding list
 
     // find contours
+    cv.findContours(
+        img_in,
+        contours,
+        hierarchy,
+        cv.RETR_CCOMP,
+        cv.CHAIN_APPROX_SIMPLE
+    );
 
-    try {
-        cv.findContours(
-            img_in,
-            contours,
-            hierarchy,
-            cv.RETR_CCOMP,
-            cv.CHAIN_APPROX_SIMPLE
-        );
-    } catch (error) {
-        console.log("error with cv.findContours", error);
-    }
-
-    try {
-        // go through contours
-        if (contours.size() > 0) {
-            for (let i = 0; i < contours.size(); i++) {
-                // check size
-                var circle = cv.minEnclosingCircle(contours.get(i));
-                if (circle.radius >= min_size && circle.radius <= max_size) {
-                    // push object into our array
-                    contour_list.push(circle);
-                }
+    // go through contours
+    if (contours.size() > 0) {
+        for (let i = 0; i < contours.size(); i++) {
+            // check size
+            var circle = cv.minEnclosingCircle(contours.get(i));
+            if (circle.radius >= min_size && circle.radius <= max_size) {
+                // push object into our array
+                contour_list.push(circle);
             }
-
-            // sort results, biggest to smallest
-            // code via: https://flaviocopes.com/how-to-sort-array-of-objects-by-property-javascript/
-            contour_list.sort((a, b) => (a.radius > b.radius ? -1 : 1));
-        } else {
-            // NO CONTOURS FOUND
-            //console.log('NO CONTOURS FOUND');
         }
-    } catch (error) {
-        console.log("error with sorting", error);
+
+        // sort results, biggest to smallest
+        // code via: https://flaviocopes.com/how-to-sort-array-of-objects-by-property-javascript/
+        contour_list.sort((a, b) => (a.radius > b.radius ? -1 : 1));
     }
 
     // clean up
