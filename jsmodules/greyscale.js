@@ -56,6 +56,5 @@ class Greyscale {
 
 // Returns a new Greyscale with id of id
 export function instance(argmap) {
-    functionQueue.includes_greyscale = true;
     return new Greyscale(argmap);
 }

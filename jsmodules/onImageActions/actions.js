@@ -1,7 +1,7 @@
 // Function to perform threshold action on an image
 // If image is greyscale, performs binary thresh, if not it will perform a threshold color by color
 export function threshold(img, color, threshold) {
-    if (color == "all" || functionQueue.includes_greyscale) {
+    if (color == "all") {
         // Test with adaptive thresholding
         // cv.adaptiveThreshold(
         //     img,
@@ -44,39 +44,11 @@ export function threshold(img, color, threshold) {
     }
 }
 
+// new change
 // Function to perform greyscale action
 export function greyscale(img) {
     cv.cvtColor(img, img, cv.COLOR_RGBA2GRAY);
-}
-
-// Function which draws circles on an image
-export function drawCircles(img, circles) {
-    // Makes the image a color image so we can draw on it
     cv.cvtColor(img, img, cv.COLOR_GRAY2RGBA);
-
-    //draws circle and center
-    let yellow_color = new cv.Scalar(255, 255, 0, 255);
-    circles.forEach(function (circle) {
-        // Draws circle
-        cv.circle(img, circle.center, circle.radius, yellow_color, 2);
-        cv.circle(img, circle.center, 1, yellow_color, 1);
-
-        // Draws radius
-        let font = cv.FONT_HERSHEY_SIMPLEX;
-        cv.putText(
-            img,
-            Math.round(circle.radius).toString(),
-            {
-                x: circle.center.x - circle.radius,
-                y: circle.center.y + circle.radius,
-            },
-            font,
-            0.5,
-            yellow_color,
-            2,
-            cv.LINE_AA
-        );
-    });
 }
 
 // Function which finds and returns max_objects number of minimum enclosing circles around contours in img_in whose radii are between min_size and max_size
@@ -115,4 +87,34 @@ export function circleObjects(img_in, max_objects, min_size, max_size) {
 
     // return, from sorted list, those that match
     return contour_list.slice(0, max_objects); // return the biggest ones
+}
+
+// Function which draws circles on an image
+export function drawCircles(img, circles) {
+    // Makes the image a color image so we can draw on it
+    cv.cvtColor(img, img, cv.COLOR_GRAY2RGBA);
+
+    //draws circle and center
+    let yellow_color = new cv.Scalar(255, 255, 0, 255);
+    circles.forEach(function (circle) {
+        // Draws circle
+        cv.circle(img, circle.center, circle.radius, yellow_color, 2);
+        cv.circle(img, circle.center, 1, yellow_color, 1);
+
+        // Draws radius
+        let font = cv.FONT_HERSHEY_SIMPLEX;
+        cv.putText(
+            img,
+            Math.round(circle.radius).toString(),
+            {
+                x: circle.center.x - circle.radius,
+                y: circle.center.y + circle.radius,
+            },
+            font,
+            0.5,
+            yellow_color,
+            2,
+            cv.LINE_AA
+        );
+    });
 }

@@ -80,9 +80,7 @@ class Threshold {
 
         // Code: uses helper function
         if (language == "JavaScript") {
-            code += mh.codeLine(
-                `thresholdHelper(img, "${color}", ${value}, includesGreyscale);`
-            );
+            code += mh.codeLine(`thresholdHelper(img, "${color}", ${value});`);
         } else {
             // TODO: Add other language support
             throw `ERROR: Language ${language} isn't supported yet`;

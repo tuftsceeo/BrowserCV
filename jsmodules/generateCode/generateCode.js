@@ -124,9 +124,8 @@ function thresholdHelper(language) {
 
     if (language == "JavaScript") {
         code += "// Threshold helper function \n";
-        code +=
-            "function thresholdHelper(img, color, threshold, includesGreyscale = false) { \n";
-        code += mh.codeLine(`if (color == "all" || includesGreyscale) {`);
+        code += "function thresholdHelper(img, color, threshold) { \n";
+        code += mh.codeLine(`if (color == "all") {`);
         code += mh.codeLine(
             `\tcv.threshold(img, img, threshold, 255, cv.THRESH_BINARY);`
         );
@@ -182,6 +181,7 @@ function greyscaleHelper(language) {
         code += "// Greyscale helper function\n";
         code += "function greyscaleHelper(img) {\n";
         code += codeLine(`cv.cvtColor(img, img, cv.COLOR_RGBA2GRAY);`);
+        code += codeLine("cv.cvtColor(img, img, cv.COLOR_GRAY2RGBA);");
         code += "}\n";
     } else {
         // TODO: Add functionality for more languages
@@ -299,7 +299,6 @@ function makeFunction(language, toInsert) {
 function processImage(img) { 
 \t// Setup
 \tlet outputs = {}; 
-\tlet includesGreyscale = ${functionQueue.includes_greyscale};
 ${toInsert}
 \t// Return outputs of sub functions
 \treturn outputs;

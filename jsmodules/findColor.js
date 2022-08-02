@@ -177,7 +177,7 @@ class FindColor {
         if (language == "JavaScript") {
             const lines = [
                 `// Threshold the image to the given brightness and color`,
-                `thresholdHelper(img, "${this.color}", ${this.brightness}, ${functionQueue.includes_greyscale});`,
+                `thresholdHelper(img, "${this.color}", ${this.brightness});`,
                 ``,
                 `// Binary the image (Greyscale it then thresh again)`,
                 `try {`,

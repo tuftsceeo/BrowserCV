@@ -69,14 +69,14 @@
                 <div class="col">
                     <!-- Sample Video and Apply Processing-->
                     <p>
-                        <button onclick="repeatProcess('video', 'fin_dest');">
+                        <button onclick="stopVideo = false; repeatProcess('video', 'fin_dest');">
                             Start Processing
                         </button>
-                        <button onclick="resetProcessing();">Stop</button>
+                        <button onclick="stopVideo = true;">Stop</button>
                     </p>
                     <p>
-                        <input value="50" id="tempo" type="number" />
-                        <label for="tempo">Sample Interval (raise for better performance)</label>
+                        <input value="30" id="fps" type="number" />
+                        <label for="fps">Sample Interval (raise for better performance)</label>
                     </p>
                     <p>
                         <canvas

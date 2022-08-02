@@ -1,15 +1,18 @@
 /**
  * TODO: Bugs
- * - Greyscale + Threshold functionality (threshold is currently changing behavior even if greyscale is after it in the queue)
+ * - Threshold for color is suuper slow
  *
  * TODO: Improve functionality of FunctionQueue
  * - Swap two functions
  *
  * TODO: Add more functions:
- * - makebitmap (thresh all 0)
+ * - Options for thresh
  * - Something using the radius of an object to find its size
  * - Location of object within 3x3 grid, passes back 1-9
  * - Motional detection (subtracts one frame from another)
+ *
+ * TODO: Add more languages
+ * - python
  *
  */
 
@@ -19,13 +22,15 @@
  *
  */
 
-// global variables to hold the SIZE of the input
+// Global variables to hold the size of the input
 var input_width = 320;
 var input_height = 240;
-
-// global variables to hold the SIZE of the output
+// And output
 var output_width = 320;
 var output_height = 240;
+
+// Global variable to track when video is stopped
+var stopVideo = false;
 
 // Get helper functions
 let codeLine, generateCode, copyToClip;
@@ -44,12 +49,7 @@ import("../jsmodules/functionQueue.js").then((Module) => {
 });
 
 // List of functions that exist to import
-let processingFunctions = [
-    "threshold",
-    "greyscale",
-    "findObjects",
-    "findColor",
-];
+let processingFunctions = ["threshold", "greyscale", "findColor"];
 
 // Used in internal testing of the generateCode function. Paste generateCode function into console then set to true via console to see what generateCode function is doing
 let test = false;
@@ -116,16 +116,6 @@ window.onload = function () {
         });
     });
 
-    // Add listener for changing video sample rate
-    let sampleRateTextBox = document.getElementById("tempo");
-    if (sampleRateTextBox) {
-        sampleRateTextBox.addEventListener("input", () => {
-            repeatProcess("video", "fin_dest");
-        });
-    } else {
-        throw `Trying to get DOM of sample rate text box before page loads`;
-    }
-
     start_video("video");
     repeatProcess("video", "fin_dest");
 };
@@ -169,26 +159,23 @@ function display_frame(src_canvas_id, dst_canvas_id) {
     return cv.imread(dst_canvas_id);
 }
 
-// Holder variable for interval of repeated processing
-var process;
-
-// Clears the interval variable
-function resetProcessing() {
-    clearInterval(process);
-}
-
-// Clears, then sets interval variable with function and interval timing
+// Repeats the video processing
 function repeatProcess(src_id, dest_id) {
-    // Reset Interval
-    resetProcessing();
-
+    let begin = Date.now();
     // set size of destination:
     var dst_canvas = document.getElementById(dest_id);
     dst_canvas.setAttribute("width", output_width);
     dst_canvas.setAttribute("height", output_height);
 
-    var tempo = document.getElementById("tempo").value;
-    process = setInterval(doProcess, tempo, src_id, dest_id);
+    // Generate this frame and display it
+    doProcess(src_id, dest_id);
+
+    // Start next frame at appropriate time
+    let fps = document.getElementById("fps").value;
+    let delay = 1000 / fps - (Date.now() - begin);
+    if (!stopVideo) {
+        setTimeout(repeatProcess, delay, src_id, dest_id);
+    }
 }
 
 // Iterates through each processing step before showing final image

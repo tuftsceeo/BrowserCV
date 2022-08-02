@@ -8,7 +8,6 @@ class FunctionQueue {
     constructor() {
         this.length = 0;
         this.functions = [];
-        this.includes_greyscale = false;
         this.id_gen_seed = 0;
     }
 
@@ -32,27 +31,7 @@ class FunctionQueue {
     }
 
     // Add step to the function processing queue
-    // Won't add greyscale twice
-    // Won't add findObjects unless image is greyscaled
     add(modulePointer) {
-        // Checks if greyscale is already there
-        if (
-            modulePointer.moduleName == "greyscale" &&
-            this.includes_greyscale
-        ) {
-            console.log("Can't Greyscale more than once");
-            return;
-        }
-
-        // Checks that image is greyscaled before adding findObjects
-        if (
-            modulePointer.moduleName == "find objects" &&
-            !this.includes_greyscale
-        ) {
-            console.log("Find Objects doesn't work unless image is greyscale");
-            return;
-        }
-
         // Creates function
         let idval = "ID" + this.id_gen_seed;
         let to_add = modulePointer.instance({ id: idval });
@@ -84,11 +63,6 @@ class FunctionQueue {
         let temp = this.functions.splice(index, 1)[0];
         this.length--;
 
-        // Updates includes_greyscale
-        if (temp.name == "greyscale") {
-            this.includes_greyscale = false;
-        }
-
         // Removes interface from html on page
         let divToRemove = document.getElementById(id);
         divToRemove.remove();
@@ -100,9 +74,6 @@ class FunctionQueue {
         // Creates deep copy
         let temp = this.functions.pop();
         this.length--;
-        if (temp.name == "greyscale") {
-            this.includes_greyscale = false;
-        }
         return temp;
     }
 
