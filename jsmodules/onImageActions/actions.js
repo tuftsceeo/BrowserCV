@@ -1,54 +1,61 @@
 // Function to perform threshold action on an image
 // If image is greyscale, performs binary thresh, if not it will perform a threshold color by color
-export function threshold(img, color, threshold) {
-    if (color == "all") {
-        // Test with adaptive thresholding
-        // cv.adaptiveThreshold(
-        //     img,
-        //     img,
-        //     255,
-        //     cv.ADAPTIVE_THRESH_GAUSSIAN_C,
-        //     cv.THRESH_BINARY,
-        //     11,
-        //     threshold
-        // );
-        // use cv.THRESH_TOZERO to keep image normal but set dim pixels to be black
-        cv.threshold(img, img, threshold, 255, cv.THRESH_BINARY);
-    } else {
-        for (var i = 0; i < img.data.length; i += 4) {
-            var r = img.data[i]; // red
-            var g = img.data[i + 1]; // green
-            var b = img.data[i + 2]; // blue
-            var a = img.data[i + 3]; // alpha
-            if (color == "red" && r - g > threshold && r - b > threshold) {
-                // pixel is very red, so leave it
-            } else if (
-                color == "green" &&
-                g - r > threshold &&
-                g - b > threshold
-            ) {
-                // Pixel is very green so do nothing
-            } else if (
-                color == "blue" &&
-                b - r > threshold &&
-                b - g > threshold
-            ) {
-                // Pixel is very blue so do nothing
-            } else {
-                // pixel is NOT very much the color we want, so set to black
-                img.data[i] = 0;
-                img.data[i + 1] = 0;
-                img.data[i + 2] = 0;
-            }
+export function threshold(img, color, type, threshold) {
+    // Make sure it's not read as a string
+    threshold = Number(threshold);
+
+    // Thresh
+    switch (type) {
+        case "binary":
+            cv.threshold(img, img, threshold, 255, cv.THRESH_BINARY);
+            break;
+        case "adaptive":
+            cv.cvtColor(img, img, cv.COLOR_BGRA2GRAY);
+            cv.adaptiveThreshold(
+                img,
+                img,
+                255,
+                cv.ADAPTIVE_THRESH_GAUSSIAN_C,
+                cv.THRESH_BINARY,
+                11,
+                threshold
+            );
+            cv.cvtColor(img, img, cv.COLOR_GRAY2BGRA);
+            break;
+        case "truncate":
+            cv.threshold(img, img, threshold, 255, cv.THRESH_TRUNC);
+            break;
+        case "to zero":
+            cv.threshold(img, img, threshold, 255, cv.THRESH_TOZERO);
+            break;
+        default:
+            console.log("No thresh value worked");
+            break;
+    }
+
+    // Keep only r, g, or b channel of image if that's the color picked
+    if (!(color == "all")) {
+        let rgba = new cv.MatVector();
+        let merged = new cv.MatVector();
+        cv.split(img, rgba);
+        if (color == "red") {
+            merged.push_back(rgba.get(0));
+        } else if (color == "green") {
+            merged.push_back(rgba.get(1));
+        } else if (color == "blue") {
+            merged.push_back(rgba.get(2));
         }
+
+        cv.merge(merged, img);
+        rgba.delete();
+        merged.delete();
     }
 }
 
-// new change
 // Function to perform greyscale action
 export function greyscale(img) {
-    cv.cvtColor(img, img, cv.COLOR_RGBA2GRAY);
-    cv.cvtColor(img, img, cv.COLOR_GRAY2RGBA);
+    cv.cvtColor(img, img, cv.COLOR_BGRA2GRAY);
+    cv.cvtColor(img, img, cv.COLOR_GRAY2BGRA);
 }
 
 // Function which finds and returns max_objects number of minimum enclosing circles around contours in img_in whose radii are between min_size and max_size
@@ -59,31 +66,45 @@ export function circleObjects(img_in, max_objects, min_size, max_size) {
     let contour_list = []; // tmp empty array for holding list
 
     // find contours
-    cv.findContours(
-        img_in,
-        contours,
-        hierarchy,
-        cv.RETR_CCOMP,
-        cv.CHAIN_APPROX_SIMPLE
-    );
 
-    // go through contours
-    if (contours.size() > 0) {
-        for (let i = 0; i < contours.size(); i++) {
-            // check size
-            var circle = cv.minEnclosingCircle(contours.get(i));
-            if (circle.radius >= min_size && circle.radius <= max_size) {
-                // push object into our array
-                contour_list.push(circle);
-            }
-        }
-        // sort results, biggest to smallest
-        // code via: https://flaviocopes.com/how-to-sort-array-of-objects-by-property-javascript/
-        contour_list.sort((a, b) => (a.radius > b.radius ? -1 : 1));
-    } else {
-        // NO CONTOURS FOUND
-        //console.log('NO CONTOURS FOUND');
+    try {
+        cv.findContours(
+            img_in,
+            contours,
+            hierarchy,
+            cv.RETR_CCOMP,
+            cv.CHAIN_APPROX_SIMPLE
+        );
+    } catch (error) {
+        console.log("error with cv.findContours", error);
     }
+
+    try {
+        // go through contours
+        if (contours.size() > 0) {
+            for (let i = 0; i < contours.size(); i++) {
+                // check size
+                var circle = cv.minEnclosingCircle(contours.get(i));
+                if (circle.radius >= min_size && circle.radius <= max_size) {
+                    // push object into our array
+                    contour_list.push(circle);
+                }
+            }
+
+            // sort results, biggest to smallest
+            // code via: https://flaviocopes.com/how-to-sort-array-of-objects-by-property-javascript/
+            contour_list.sort((a, b) => (a.radius > b.radius ? -1 : 1));
+        } else {
+            // NO CONTOURS FOUND
+            //console.log('NO CONTOURS FOUND');
+        }
+    } catch (error) {
+        console.log("error with sorting", error);
+    }
+
+    // clean up
+    contours.delete();
+    hierarchy.delete();
 
     // return, from sorted list, those that match
     return contour_list.slice(0, max_objects); // return the biggest ones
@@ -92,7 +113,7 @@ export function circleObjects(img_in, max_objects, min_size, max_size) {
 // Function which draws circles on an image
 export function drawCircles(img, circles) {
     // Makes the image a color image so we can draw on it
-    cv.cvtColor(img, img, cv.COLOR_GRAY2RGBA);
+    cv.cvtColor(img, img, cv.COLOR_GRAY2BGRA);
 
     //draws circle and center
     let yellow_color = new cv.Scalar(255, 255, 0, 255);

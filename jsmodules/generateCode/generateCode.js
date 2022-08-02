@@ -124,42 +124,59 @@ function thresholdHelper(language) {
 
     if (language == "JavaScript") {
         code += "// Threshold helper function \n";
-        code += "function thresholdHelper(img, color, threshold) { \n";
-        code += mh.codeLine(`if (color == "all") {`);
-        code += mh.codeLine(
-            `\tcv.threshold(img, img, threshold, 255, cv.THRESH_BINARY);`
-        );
-        code += mh.codeLine("} else {");
+        code += "function thresholdHelper(img, color, type, threshold) { \n";
         let lines = [
-            `for (let i = 0; i < img.data.length; i += 4) {`,
-            `    let r = img.data[i]; // red`,
-            `    let g = img.data[i + 1]; // green`,
-            `    let b = img.data[i + 2]; // blue`,
-            `    let a = img.data[i + 3]; // alpha`,
-            `    if (color == "red" && r - g > threshold && r - b > threshold) {`,
-            `       // pixel is very red, so leave it`,
-            `    } else if (`,
-            `        color == "green" &&`,
-            `        g - r > threshold &&`,
-            `        g - b > threshold`,
-            `    ) {`,
-            `        // Pixel is very green so do nothing`,
-            `    } else if (`,
-            `        color == "blue" &&`,
-            `        b - r > threshold &&`,
-            `        b - g > threshold`,
-            `    ) {`,
-            `        // Pixel is very blue so do nothing`,
-            `    } else {`,
-            `        // pixel is NOT very much the color we want, so set to black`,
-            `        img.data[i] = 0;`,
-            `        img.data[i + 1] = 0;`,
-            `        img.data[i + 2] = 0;`,
-            `    }`,
+            `// Make sure it's not read as a string`,
+            `threshold = Number(threshold);`,
+            ``,
+            `// Thresh`,
+            `switch (type) {`,
+            `\tcase "binary":`,
+            `\t\tcv.threshold(img, img, threshold, 255, cv.THRESH_BINARY);`,
+            `\t\tbreak;`,
+            `\tcase "adaptive":`,
+            `\t\tcv.cvtColor(img, img, cv.COLOR_BGRA2GRAY);`,
+            `\t\tcv.adaptiveThreshold(`,
+            `\t\t\timg,`,
+            `\t\t\timg,`,
+            `\t\t\t255,`,
+            `\t\t\tcv.ADAPTIVE_THRESH_GAUSSIAN_C,`,
+            `\t\t\tcv.THRESH_BINARY,`,
+            `\t\t\t11,`,
+            `\t\t\tthreshold`,
+            `\t\t);`,
+            `\t\tcv.cvtColor(img, img, cv.COLOR_GRAY2BGRA);`,
+            `\t\tbreak;`,
+            `\tcase "truncate":`,
+            `\t\tcv.threshold(img, img, threshold, 255, cv.THRESH_TRUNC);`,
+            `\t\tbreak;`,
+            `\tcase "to zero":`,
+            `\t\tcv.threshold(img, img, threshold, 255, cv.THRESH_TOZERO);`,
+            `\t\tbreak;`,
+            `\tdefault:`,
+            `\t\tconsole.log("No thresh value worked");`,
+            `\t\tbreak;`,
             `}`,
+            ``,
+            `// Keep only r, g, or b channel of image if that's the color picked`,
+            `if (!(color == "all")) {`,
+            `\tlet rgba = new cv.MatVector();`,
+            `\tlet merged = new cv.MatVector();`,
+            `\tcv.split(img, rgba);`,
+            `\tif (color == "red") {`,
+            `\t\tmerged.push_back(rgba.get(0));`,
+            `\t} else if (color == "green") {`,
+            `\t\tmerged.push_back(rgba.get(1));`,
+            `\t} else if (color == "blue") {`,
+            `\t\tmerged.push_back(rgba.get(2));`,
+            `\t}`,
+            ``,
+            `\tcv.merge(merged, img);`,
+            `\trgba.delete();`,
+            `\tmerged.delete();`,
         ];
         lines.forEach(function (line) {
-            code += mh.codeLine("\t" + line);
+            code += mh.codeLine(line);
         });
         code += mh.codeLine("}");
         code += "} \n";
@@ -180,8 +197,8 @@ function greyscaleHelper(language) {
     if (language == "JavaScript") {
         code += "// Greyscale helper function\n";
         code += "function greyscaleHelper(img) {\n";
-        code += codeLine(`cv.cvtColor(img, img, cv.COLOR_RGBA2GRAY);`);
-        code += codeLine("cv.cvtColor(img, img, cv.COLOR_GRAY2RGBA);");
+        code += codeLine(`cv.cvtColor(img, img, cv.COLOR_BGRA2GRAY);`);
+        code += codeLine("cv.cvtColor(img, img, cv.COLOR_GRAY2BGRA);");
         code += "}\n";
     } else {
         // TODO: Add functionality for more languages
@@ -232,6 +249,10 @@ function circleObjectsHelper(language) {
 \t\t// NO CONTOURS FOUND
 \t\t//console.log('NO CONTOURS FOUND');
 \t}
+
+// clean up
+contours.delete();
+hierarchy.delete();
         
 \t// return, from sorted list, those that match
 \treturn contour_list.slice(0, max_objects); // return the biggest ones
@@ -254,7 +275,7 @@ function drawCirclesHelper(language) {
         code += "// Draw circles helper function \n";
         code += `function drawCirclesHelper(img, circles) {
 \t// Makes the image a color image so we can draw on it
-\tcv.cvtColor(img, img, cv.COLOR_GRAY2RGBA);
+\tcv.cvtColor(img, img, cv.COLOR_GRAY2BGRA);
         
 \t//draws circle and center
 \tlet yellow_color = new cv.Scalar(255, 255, 0, 255);

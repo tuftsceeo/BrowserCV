@@ -130,7 +130,7 @@ class FindColor {
 
     execute(img) {
         // Threshold the image to the given brightness and color
-        act.threshold(img, this.color, this.brightness);
+        act.threshold(img, this.color, "binary", this.brightness);
 
         // Binary the image (Greyscale it then thresh again)
         try {
@@ -144,15 +144,20 @@ class FindColor {
         // Reset output coords
         this.outputs.coords.length = 0;
 
+        let circles;
         try {
             // Get contours around objects
-            let circles = act.circleObjects(
+            circles = act.circleObjects(
                 img,
                 this.maxnum,
                 this.minsize,
                 this.maxsize
             );
+        } catch (error) {
+            console.log(`Error with circleObjects ` + error);
+        }
 
+        try {
             // For each contour, put its center as the coords of an object in
             // the outputs.coords array
             for (let i = 0; i < circles.length; i++) {
@@ -165,7 +170,7 @@ class FindColor {
                 act.drawCircles(img, circles);
             }
         } catch (error) {
-            console.log("Error with find color:", error);
+            console.log("Error with drawCircles:", error);
         }
     }
 

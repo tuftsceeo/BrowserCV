@@ -12,8 +12,16 @@
     </select>
 
     <p>
-        <label for="${id}$thresh"> Threshold </label>
+        <label for="${id}$type"> Pick a type: </label>
+        <select type="text" id="${id}$type" name="${id}$type" value="binary">
+            <option value="binary">binary</option>
+            <option value="adaptive">adaptive</option>
+            <option value="truncate">truncate</option>
+            <option value="to zero">to zero</option>
+        </select>
     </p>
+
+    <label for="${id}$thresh"> Threshold </label>
     <input
         type="range"
         id="${id}$thresh"

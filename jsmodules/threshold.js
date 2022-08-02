@@ -29,6 +29,12 @@ export function render(destinationElement, id) {
         functionQueue.functionWithID(id).params.color = this.value;
     });
 
+    // Type listener
+    let typeSelect = document.getElementById(id + "type");
+    typeSelect.addEventListener("input", function () {
+        functionQueue.functionWithID(id).params.type = this.value;
+    });
+
     // Threshold value listener
     let threshValueSelect = document.getElementById(id + "thresh");
     threshValueSelect.addEventListener("input", function () {
@@ -42,7 +48,8 @@ class Threshold {
     name = "threshold";
     params = {
         color: "all",
-        value: "30",
+        value: 30,
+        type: "binary",
     };
 
     constructor(argmap) {
@@ -52,6 +59,9 @@ class Threshold {
         }
         if ("value" in argmap) {
             this.params.value = argmap.value;
+        }
+        if ("type" in argmap) {
+            this.params.type = argmap.type;
         }
     }
 
@@ -63,13 +73,18 @@ class Threshold {
         return this.params.value;
     }
 
+    get type() {
+        return this.params.type;
+    }
+
     execute(img) {
         // Get values
         let color = this.params.color;
         let thresh = Number(this.params.value);
+        let type = this.params.type;
 
         // Perform thresholding
-        act.threshold(img, color, thresh);
+        act.threshold(img, color, type, thresh);
     }
 
     generateCode(language) {
@@ -77,10 +92,13 @@ class Threshold {
         let code = "";
         let color = this.color;
         let value = this.value;
+        let type = this.type;
 
         // Code: uses helper function
         if (language == "JavaScript") {
-            code += mh.codeLine(`thresholdHelper(img, "${color}", ${value});`);
+            code += mh.codeLine(
+                `thresholdHelper(img, "${color}", "${type}", ${value});`
+            );
         } else {
             // TODO: Add other language support
             throw `ERROR: Language ${language} isn't supported yet`;
