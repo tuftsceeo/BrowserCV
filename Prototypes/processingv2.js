@@ -29,10 +29,10 @@ var input_height = 240;
 var output_width = 320;
 var output_height = 240;
 
-// Global variable to track when video is stopped
+// Global variable to track when video is stopped by user
 var stopVideo = false;
 
-// Get helper functions
+// Import functions used here
 let codeLine, generateCode, copyToClip;
 import("../jsmodules/moduleSetup/moduleHelper.js").then((mh) => {
     codeLine = mh.codeLine;
@@ -42,7 +42,7 @@ import("../jsmodules/generateCode/generateCode.js").then((gc) => {
     generateCode = gc.generateCode;
 });
 
-// Set up functionQueue
+// Import and set up functionQueue
 var functionQueue;
 import("../jsmodules/functionQueue.js").then((Module) => {
     functionQueue = Module.instance();
@@ -74,7 +74,9 @@ function addButton(ModulePointer) {
         // add to functionQueue
         let id = functionQueue.add(ModulePointer);
         if (!id) {
-            throw `Error adding ${ModulePointer.moduleName}, functionQueue.add didn't return an ID`;
+            console.log(
+                `Error adding ${ModulePointer.moduleName}, functionQueue.add didn't return an ID`
+            );
         }
         // render interface
         let newDiv = document.createElement("div");
@@ -116,6 +118,7 @@ window.onload = function () {
         });
     });
 
+    // Start video and processing
     start_video("video");
     repeatProcess("video", "fin_dest");
 };
@@ -126,7 +129,7 @@ window.onload = function () {
  *
  */
 
-// Function from Prof. Danahy to start streaming video (chrome only?)
+// Function from Prof. Danahy to start streaming video
 function start_video(video_id) {
     var video_canvas = document.getElementById(video_id);
     // Set the width and height:
@@ -144,45 +147,52 @@ function start_video(video_id) {
     }
 }
 
-// Takes video data and displays on a canvas, also can return frame as img
-function display_frame(src_canvas_id, dst_canvas_id) {
-    // source canvas
-    var src_canvas = document.getElementById(src_canvas_id);
+// Runs video processing and displays frame
+function repeatProcess(video_id, dest_id) {
+    // Setup
+    let video_canvas = document.getElementById(video_id);
 
-    // draw src onto dst
-    // see: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage
-    // create output canvas context
-    let dst_canvas = document.getElementById(dst_canvas_id);
-    let dst_canvas_context = dst_canvas.getContext("2d");
-    dst_canvas_context.drawImage(src_canvas, 0, 0, output_width, output_height);
-    // return the image data
-    return cv.imread(dst_canvas_id);
-}
+    try {
+        let img = new cv.Mat(
+            video_canvas.height,
+            video_canvas.width,
+            cv.CV_8UC4
+        );
+        let cap = new cv.VideoCapture(video_canvas);
+        let begin = Date.now();
+        // set size of destination:
+        var dst_canvas = document.getElementById(dest_id);
+        dst_canvas.setAttribute("width", output_width);
+        dst_canvas.setAttribute("height", output_height);
 
-// Repeats the video processing
-function repeatProcess(src_id, dest_id) {
-    let begin = Date.now();
-    // set size of destination:
-    var dst_canvas = document.getElementById(dest_id);
-    dst_canvas.setAttribute("width", output_width);
-    dst_canvas.setAttribute("height", output_height);
+        // Generate this frame
+        cap.read(img);
 
-    // Generate this frame and display it
-    doProcess(src_id, dest_id);
+        // Run processing on frame
+        doProcess(img, dest_id);
 
-    // Start next frame at appropriate time
-    let fps = document.getElementById("fps").value;
-    let delay = 1000 / fps - (Date.now() - begin);
-    if (!stopVideo) {
-        setTimeout(repeatProcess, delay, src_id, dest_id);
+        // Display frame
+        cv.imshow(dest_id, img);
+
+        // Clean Up
+        img.delete();
+
+        // Start next frame at appropriate time unless stopped
+        let fps = document.getElementById("fps").value;
+        let delay = 1000 / fps - (Date.now() - begin);
+        if (!stopVideo) {
+            setTimeout(repeatProcess, delay, video_id, dest_id);
+        }
+    } catch (error) {
+        console.log(error);
+        if (!stopVideo) {
+            setTimeout(repeatProcess, 100, video_id, dest_id);
+        }
     }
 }
 
 // Iterates through each processing step before showing final image
-function doProcess(src_id, dest_id) {
-    // Read image from the video stream
-    var img = display_frame(src_id, dest_id);
-
+function doProcess(img, dest_id) {
     // For debugging generateCode
     if (test) {
         // Do predefined function on img
@@ -193,8 +203,4 @@ function doProcess(src_id, dest_id) {
             functionQueue.function_at(i).execute(img);
         }
     }
-
-    // Show final image
-    cv.imshow(dest_id, img);
-    img.delete();
 }
