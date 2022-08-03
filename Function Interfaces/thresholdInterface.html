@@ -3,14 +3,6 @@
         ID: ${id}$ Name: ${name}$
         <button onclick="functionQueue.removeWithID( '${id}$' );">X</button>
     </p>
-    <label for="${id}$color"> Pick a color to Thresh: </label>
-    <select type="text" id="${id}$color" name="${id}$color" value="all">
-        <option value="all">all</option>
-        <option value="red">red</option>
-        <option value="green">green</option>
-        <option value="blue">blue</option>
-    </select>
-
     <p>
         <label for="${id}$type"> Pick a type: </label>
         <select type="text" id="${id}$type" name="${id}$type" value="binary">
@@ -18,8 +10,17 @@
             <option value="adaptive">adaptive</option>
             <option value="truncate">truncate</option>
             <option value="to zero">to zero</option>
+            <option value="color">color</option>
         </select>
     </p>
+    <div id="${id}$colorSelect">
+        <label for="${id}$color"> Pick a color to Thresh: </label>
+        <select type="text" id="${id}$color" name="${id}$color" value="red">
+            <option value="red">red</option>
+            <option value="green">green</option>
+            <option value="blue">blue</option>
+        </select>
+    </div>
 
     <label for="${id}$thresh"> Threshold </label>
     <input

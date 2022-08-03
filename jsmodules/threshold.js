@@ -22,17 +22,15 @@ export function render(destinationElement, id) {
     // Puts function interface HTML on page
     mh.displayInterface(destinationElement, id, moduleCode.contents);
 
+    // Hides color select at first
+    let colorSelector = document.getElementById(id + "colorSelect");
+    colorSelector.style.display = "none";
+
     // Adds listeners to the inputs to change the function in functionQueue
     // Color select listener
     let colorSelect = document.getElementById(id + "color");
     colorSelect.addEventListener("input", function () {
         functionQueue.functionWithID(id).params.color = this.value;
-    });
-
-    // Type listener
-    let typeSelect = document.getElementById(id + "type");
-    typeSelect.addEventListener("input", function () {
-        functionQueue.functionWithID(id).params.type = this.value;
     });
 
     // Threshold value listener
@@ -41,13 +39,27 @@ export function render(destinationElement, id) {
         functionQueue.functionWithID(id).params.value = this.value;
         document.getElementById(id + "threshValue").innerHTML = this.value;
     });
+
+    // Type listener
+    let typeSelect = document.getElementById(id + "type");
+    typeSelect.addEventListener("input", function () {
+        functionQueue.functionWithID(id).params.type = this.value;
+        if (this.value == "color") {
+            colorSelector.style.display = "block";
+        } else if (this.value == "adaptive") {
+            threshValueSelect.max = 50;
+        } else {
+            colorSelector.style.display = "none";
+            threshValueSelect.max = 255;
+        }
+    });
 }
 
 // Class representing Threshold function that gets added to functionQueue
 class Threshold {
     name = "threshold";
     params = {
-        color: "all",
+        color: "red",
         value: 30,
         type: "binary",
     };
@@ -84,7 +96,7 @@ class Threshold {
         let type = this.params.type;
 
         // Perform thresholding
-        act.threshold(img, color, type, thresh);
+        act.threshold(img, type, thresh, color);
     }
 
     generateCode(language) {
@@ -97,7 +109,7 @@ class Threshold {
         // Code: uses helper function
         if (language == "JavaScript") {
             code += mh.codeLine(
-                `thresholdHelper(img, "${color}", "${type}", ${value});`
+                `thresholdHelper(img, "${type}", ${value}, "${color}");`
             );
         } else {
             // TODO: Add other language support

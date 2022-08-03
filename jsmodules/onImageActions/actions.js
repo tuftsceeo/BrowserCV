@@ -1,6 +1,6 @@
 // Function to perform threshold action on an image
 // If image is greyscale, performs binary thresh, if not it will perform a threshold color by color
-export function threshold(img, color, type, threshold) {
+export function threshold(img, type, threshold, color = "red") {
     // Make sure it's not read as a string
     threshold = Number(threshold);
 
@@ -28,27 +28,58 @@ export function threshold(img, color, type, threshold) {
         case "to zero":
             cv.threshold(img, img, threshold, 255, cv.THRESH_TOZERO);
             break;
+        case "color":
+            // Get individual color channels
+            let rgba = new cv.MatVector();
+            cv.split(img, rgba);
+            let r = rgba.get(0);
+            let g = rgba.get(1);
+            let b = rgba.get(2);
+
+            // Set which color is chosen
+            let chosen, other1, other2;
+            if (color == "red") {
+                chosen = r;
+                other1 = g;
+                other2 = b;
+            } else if (color == "blue") {
+                chosen = b;
+                other1 = g;
+                other2 = r;
+            } else {
+                chosen = g;
+                other1 = r;
+                other2 = b;
+            }
+
+            // Setup
+            let merged = new cv.MatVector();
+            let test1 = new cv.Mat();
+            let test2 = new cv.Mat();
+
+            // See which pixels are threshold larger than both other1 and 2
+            cv.subtract(chosen, other1, test1);
+            cv.threshold(test1, test1, threshold, 255, cv.THRESH_BINARY);
+            cv.subtract(chosen, other2, test2);
+            cv.threshold(test2, test2, threshold, 255, cv.THRESH_BINARY);
+            cv.bitwise_and(test1, test2, test1); // results go in test1
+
+            // Place results on image
+            merged.push_back(test1);
+            cv.merge(merged, img);
+
+            // Cleanup
+            chosen.delete();
+            other1.delete();
+            other2.delete();
+            test1.delete();
+            test2.delete();
+            rgba.delete();
+            merged.delete();
+            break;
         default:
             console.log("No thresh value worked");
             break;
-    }
-
-    // Keep only r, g, or b channel of image if that's the color picked
-    if (!(color == "all")) {
-        let rgba = new cv.MatVector();
-        let merged = new cv.MatVector();
-        cv.split(img, rgba);
-        if (color == "red") {
-            merged.push_back(rgba.get(0));
-        } else if (color == "green") {
-            merged.push_back(rgba.get(1));
-        } else if (color == "blue") {
-            merged.push_back(rgba.get(2));
-        }
-
-        cv.merge(merged, img);
-        rgba.delete();
-        merged.delete();
     }
 }
 
