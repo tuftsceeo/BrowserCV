@@ -51,7 +51,12 @@ import("../jsmodules/functionQueue.js").then((Module) => {
 });
 
 // List of functions that exist to import
-let processingFunctions = ["threshold", "greyscale", "findColor"];
+let processingFunctions = [
+    "threshold",
+    "greyscale",
+    "findColor",
+    "backgroundSubtract",
+];
 
 // Used in internal testing of the generateCode function. Paste generateCode function into console then set to true via console to see what generateCode function is doing
 let test = false;
@@ -153,20 +158,14 @@ function start_video(video_id) {
 function repeatProcess(video_id, dest_id) {
     // Setup
     let video_canvas = document.getElementById(video_id);
+    let img = new cv.Mat(video_canvas.height, video_canvas.width, cv.CV_8UC4);
+    let cap = new cv.VideoCapture(video_canvas);
+    let begin = Date.now();
+    var dst_canvas = document.getElementById(dest_id);
+    dst_canvas.setAttribute("width", output_width);
+    dst_canvas.setAttribute("height", output_height);
 
     try {
-        let img = new cv.Mat(
-            video_canvas.height,
-            video_canvas.width,
-            cv.CV_8UC4
-        );
-        let cap = new cv.VideoCapture(video_canvas);
-        let begin = Date.now();
-        // set size of destination:
-        var dst_canvas = document.getElementById(dest_id);
-        dst_canvas.setAttribute("width", output_width);
-        dst_canvas.setAttribute("height", output_height);
-
         // Generate this frame
         cap.read(img);
 
@@ -175,21 +174,28 @@ function repeatProcess(video_id, dest_id) {
 
         // Display frame
         cv.imshow(dest_id, img);
-
-        // Clean Up
-        img.delete();
-
-        // Start next frame at appropriate time unless stopped
-        let fps = document.getElementById("fps").value;
-        let delay = 1000 / fps - (Date.now() - begin);
-        if (!stopVideo) {
-            setTimeout(repeatProcess, delay, video_id, dest_id);
-        }
     } catch (error) {
         console.log(error);
-        if (!stopVideo) {
-            setTimeout(repeatProcess, 100, video_id, dest_id);
-        }
+    }
+
+    // Clean Up
+    img.delete();
+
+    // Start next frame at appropriate time unless stopped
+    let fps = document.getElementById("fps").value;
+    let elapsed = Date.now() - begin;
+    let allowedDelay = 1000 / fps;
+    let delay = allowedDelay - elapsed;
+    // Warn if frame took too long to generate
+    if (delay < 0) {
+        console.log(
+            `Processing took longer than expected (${elapsed} ms > ${Number(
+                allowedDelay.toFixed(1)
+            )} ms). Please lower the render FPS or remove a processing function.`
+        );
+    }
+    if (!stopVideo) {
+        setTimeout(repeatProcess, delay, video_id, dest_id);
     }
 }
 

@@ -95,6 +95,7 @@ function insertHelperFuncs(language, allHelperNames) {
         greyscale: greyscaleHelper,
         circleObjects: circleObjectsHelper,
         drawCircles: drawCirclesHelper,
+        backgroundSubtract: backgroundSubtractHelper,
     };
 
     // Add helper functions in allHelperNames
@@ -232,6 +233,28 @@ function greyscaleHelper(language) {
         code += codeLine(`cv.cvtColor(img, img, cv.COLOR_BGRA2GRAY);`);
         code += codeLine("cv.cvtColor(img, img, cv.COLOR_GRAY2BGRA);");
         code += "}\n";
+    } else {
+        // TODO: Add functionality for more languages
+        throw `ERROR: Language ${language} is not supported yet`;
+    }
+
+    return code;
+}
+
+// Returns the code for the helper function for backgroundSubtract
+// Helper function for insertHelperFuncs
+function backgroundSubtractHelper(language) {
+    // Setup
+    let code = "";
+
+    if (language == "JavaScript") {
+        code += "// Subtract Background helper\n";
+        code += "// This fgbg (foreground background) object needs to exist\n";
+        code += "// through multiple frames - so it gets defined outside of\n";
+        code += "// the process function\n";
+        code += "// WARNING: run fgbg.delete() at the end of your program\n";
+        code += "// to avoid leaking memory\n";
+        code += "var fgbg = new cv.BackgroundSubtractorMOG2(500, 16, true);\n";
     } else {
         // TODO: Add functionality for more languages
         throw `ERROR: Language ${language} is not supported yet`;
