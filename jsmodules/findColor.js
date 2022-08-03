@@ -130,7 +130,7 @@ class FindColor {
 
     execute(img) {
         // Threshold the image to the given brightness and color
-        act.threshold(img, "binary", this.brightness, this.color);
+        act.threshold(img, "color", this.brightness, this.color);
 
         // Reset output coords
         this.outputs.coords.length = 0;
@@ -163,7 +163,7 @@ class FindColor {
         if (language == "JavaScript") {
             const lines = [
                 `// Threshold the image to the given brightness and color`,
-                `thresholdHelper(img, "binary", ${this.brightness}, "${this.color}");`,
+                `thresholdHelper(img, "color", ${this.brightness}, "${this.color}");`,
                 "",
                 `// Reset output coords`,
                 `outputs.${this.id} = [];`,
