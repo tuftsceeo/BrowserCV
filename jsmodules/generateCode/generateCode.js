@@ -275,7 +275,7 @@ function circleObjectsHelper(language) {
 \t// setup
 \tlet contours = new cv.MatVector();
 \tlet hierarchy = new cv.Mat();
-\tlet contour_list = []; // tmp empty array for holding list
+\tlet circle_list = []; // tmp empty array for holding list
         
 \t// find contours
 \tcv.findContours(
@@ -293,13 +293,13 @@ function circleObjectsHelper(language) {
 \t\t\tvar circle = cv.minEnclosingCircle(contours.get(i));
 \t\t\tif (circle.radius >= min_size && circle.radius <= max_size) {
 \t\t\t\t// push object into our array
-\t\t\t\tcontour_list.push(circle);
+\t\t\t\tcircle_list.push(circle);
 \t\t\t}
 \t\t}
 
 \t\t// sort results, biggest to smallest
 \t\t// code via: https://flaviocopes.com/how-to-sort-array-of-objects-by-property-javascript/
-\t\tcontour_list.sort((a, b) => (a.radius > b.radius ? -1 : 1));
+\t\tcircle_list.sort((a, b) => (a.radius > b.radius ? -1 : 1));
 \t}
 
 \t// clean up
@@ -307,7 +307,7 @@ function circleObjectsHelper(language) {
 \thierarchy.delete();
         
 \t// return, from sorted list, those that match
-\treturn contour_list.slice(0, max_objects); // return the biggest ones
+\treturn circle_list.slice(0, max_objects); // return the biggest ones
 }\n`;
     } else {
         // TODO: Add functionality for more languages

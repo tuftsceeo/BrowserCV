@@ -1,12 +1,12 @@
 /**
  * TODO: Bugs
- * - Memory leak crashes browser when findcolor is open too long
+ * -
  *
  * TODO: Improve functionality of FunctionQueue
  * - Swap two functions
  *
  * TODO: Add more functions:
- * - Options for thresh
+ * - Re-add findObjects
  * - Something using the radius of an object to find its size
  * - Location of object within 3x3 grid, passes back 1-9
  * - Motional detection (subtracts one frame from another)

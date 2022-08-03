@@ -75,7 +75,7 @@ class FindColor {
         visualize: true,
     };
     outputs = {
-        coords: [],
+        circles: [],
     };
 
     constructor(argmap) {
@@ -104,8 +104,8 @@ class FindColor {
         return this.outputs;
     }
 
-    get coords() {
-        return this.outputs.coords;
+    get circles() {
+        return this.outputs.circles;
     }
 
     get minsize() {
@@ -132,9 +132,6 @@ class FindColor {
         // Threshold the image to the given brightness and color
         act.threshold(img, "color", this.brightness, this.color);
 
-        // Reset output coords
-        this.outputs.coords.length = 0;
-
         // Get contours around objects
         let circles = act.circleObjects(
             img,
@@ -143,12 +140,8 @@ class FindColor {
             this.maxsize
         );
 
-        // For each contour, put its center as the coords of an object in
-        // the outputs.coords array
-        for (let i = 0; i < circles.length; i++) {
-            let circle = circles[i];
-            this.outputs.coords.push(circle.center);
-        }
+        // Put each circle in outputs
+        this.outputs.circles = circles;
 
         // Visualize where contours are
         if (this.params.visualize) {
@@ -164,12 +157,9 @@ class FindColor {
             const lines = [
                 `// Threshold the image to the given brightness and color`,
                 `thresholdHelper(img, "color", ${this.brightness}, "${this.color}");`,
-                "",
-                `// Reset output coords`,
-                `outputs.${this.id} = [];`,
                 ``,
                 `try {`,
-                `    // Get contours around objects`,
+                `    // Get circles around objects`,
                 `    let circles${this.id} = circleObjectsHelper(`,
                 `        img,`,
                 `        ${this.maxnum},`,
@@ -177,11 +167,8 @@ class FindColor {
                 `        ${this.maxsize}`,
                 `    );`,
                 ``,
-                `    // For each contour, put its center in outputs`,
-                `    for (let i = 0; i < circles${this.id}.length; i++) {`,
-                `        let circle = circles${this.id}[i];`,
-                `        outputs.${this.id}.push(circle.center);`,
-                `    }`,
+                `    // Put each circle in outputs`,
+                `    outputs.${this.id} = circles${this.id};`,
                 ``,
                 `    // Visualize where contours are`,
                 `    if (${this.params.visualize}) {`,

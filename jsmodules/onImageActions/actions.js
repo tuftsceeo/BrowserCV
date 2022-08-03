@@ -94,7 +94,7 @@ export function circleObjects(img_in, max_objects, min_size, max_size) {
     // setup
     let contours = new cv.MatVector();
     let hierarchy = new cv.Mat();
-    let contour_list = []; // tmp empty array for holding list
+    let circle_list = []; // tmp empty array for holding list
 
     // find contours
     cv.findContours(
@@ -112,13 +112,13 @@ export function circleObjects(img_in, max_objects, min_size, max_size) {
             var circle = cv.minEnclosingCircle(contours.get(i));
             if (circle.radius >= min_size && circle.radius <= max_size) {
                 // push object into our array
-                contour_list.push(circle);
+                circle_list.push(circle);
             }
         }
 
         // sort results, biggest to smallest
         // code via: https://flaviocopes.com/how-to-sort-array-of-objects-by-property-javascript/
-        contour_list.sort((a, b) => (a.radius > b.radius ? -1 : 1));
+        circle_list.sort((a, b) => (a.radius > b.radius ? -1 : 1));
     }
 
     // clean up
@@ -126,7 +126,7 @@ export function circleObjects(img_in, max_objects, min_size, max_size) {
     hierarchy.delete();
 
     // return, from sorted list, those that match
-    return contour_list.slice(0, max_objects); // return the biggest ones
+    return circle_list.slice(0, max_objects); // return the biggest ones
 }
 
 // Function which draws circles on an image
