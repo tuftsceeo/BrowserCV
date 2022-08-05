@@ -213,7 +213,7 @@ function repeatProcess(video_id, dest_id) {
         // Display frame
         cv.imshow(dest_id, img);
     } catch (error) {
-        console.log(error);
+        handleError(error);
     }
 
     // Clean Up
@@ -276,7 +276,13 @@ function doProcess(img) {
     }
 }
 
-// Function for testing code generated
+/*
+ *
+ * Debugging
+ *
+ */
+
+// Function for testing code generated from generateCode
 function testCode() {
     // Setup
     test = !test;
@@ -331,4 +337,28 @@ function areSameImg(img1, img2) {
 
     // Must be the same
     return { areSame, count };
+}
+
+// Get more info from openCV errors
+// Via https://docs.opencv.org/4.x/utils.js
+function handleError(error) {
+    if (typeof error === "undefined") {
+        error = "";
+    } else if (typeof error === "number") {
+        if (!isNaN(error)) {
+            if (typeof cv !== "undefined") {
+                error = "Exception: " + cv.exceptionFromPtr(error).msg;
+            }
+        }
+    } else if (typeof error === "string") {
+        let ptr = Number(error.split(" ")[0]);
+        if (!isNaN(ptr)) {
+            if (typeof cv !== "undefined") {
+                error = "Exception: " + cv.exceptionFromPtr(ptr).msg;
+            }
+        }
+    } else if (error instanceof Error) {
+        error = error.stack.replace(/\n/g, "<br>");
+    }
+    console.log(error);
 }
