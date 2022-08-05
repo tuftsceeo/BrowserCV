@@ -263,6 +263,11 @@ function backgroundSubtractHelper(language) {
         code += "// the process function\n";
         code += "// WARNING: run fgbg.delete() at the end of your program\n";
         code += "// to avoid leaking memory\n";
+        code += `try {
+    fgbg.delete()
+} catch (error) {
+
+}`;
         code += "var fgbg = new cv.BackgroundSubtractorMOG2(500, 16, true);\n";
     } else {
         // TODO: Add functionality for more languages
