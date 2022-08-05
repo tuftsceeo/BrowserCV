@@ -1,4 +1,4 @@
-// Module for findColor processing function and related js functions
+// Module for findObjects processing function and related js functions
 // Exports:
 // moduleName
 // render(destinationElement, id)
@@ -10,10 +10,10 @@ import * as act from "./onImageActions/actions.js"; // for execute
 import * as mh from "./moduleSetup/moduleHelper.js"; // for module setup
 
 // Identifier
-export let moduleName = "find color";
+export let moduleName = "find objects";
 
 // internal variables:
-let moduleCodePath = "../Function Interfaces/findColorInterface.html";
+let moduleCodePath = "../Function Interfaces/findObjectsInterface.html";
 // onload of module, get moduleCode
 let moduleCode = { contents: null };
 mh.loadCode(moduleCodePath, moduleCode);
@@ -48,27 +48,13 @@ export function render(destinationElement, id) {
     visualizeSelect.addEventListener("input", function () {
         thisFunc.params.visualize = !thisFunc.params.visualize;
     });
-    // Color select listener
-    let colorSelect = document.getElementById(id + "color");
-    colorSelect.addEventListener("input", function () {
-        functionQueue.functionWithID(id).params.color = this.value;
-    });
-
-    // Brightness value listener
-    let threshValueSelect = document.getElementById(id + "thresh");
-    threshValueSelect.addEventListener("input", function () {
-        functionQueue.functionWithID(id).params.brightness = this.value;
-        document.getElementById(id + "threshValue").innerHTML = this.value;
-    });
 }
 
-// Class representing findColor function that gets added to functionQueue
-class FindColor {
-    name = "findColor";
+// Class representing findObjects function that gets added to functionQueue
+class FindObjects {
+    name = "findObjects";
     params = {
         // Minimum & Maximum enclosing circle size
-        color: "red",
-        brightness: 30,
         minsize: 20,
         maxsize: 40,
         maxnum: 4,
@@ -80,12 +66,6 @@ class FindColor {
 
     constructor(argmap) {
         this.id = argmap.id;
-        if ("color" in argmap) {
-            this.color = argmap.color;
-        }
-        if ("brightness" in argmap) {
-            this.brightness = argmap.brightness;
-        }
         if ("minsize" in argmap) {
             this.minsize = argmap.minsize;
         }
@@ -120,18 +100,7 @@ class FindColor {
         return this.params.maxnum;
     }
 
-    get color() {
-        return this.params.color;
-    }
-
-    get brightness() {
-        return this.params.brightness;
-    }
-
     execute(img) {
-        // Threshold the image to the given brightness and color
-        act.threshold(img, "color", this.brightness, this.color);
-
         // Get contours around objects
         let circles = act.circleObjects(
             img,
@@ -153,11 +122,9 @@ class FindColor {
         // Setup
         let code = "";
 
+        // Check for language
         if (language == "JavaScript") {
             const lines = [
-                `// Threshold the image to the given brightness and color`,
-                `thresholdHelper(img, "color", ${this.brightness}, "${this.color}");`,
-                ``,
                 `// Get circles around objects`,
                 `let circles${this.id} = circleObjectsHelper(`,
                 `\timg,`,
@@ -174,13 +141,15 @@ class FindColor {
                 `\tdrawCirclesHelper(img, circles${this.id});`,
                 `}`,
             ];
+
             lines.forEach((line) => {
                 code += mh.codeLine(line);
             });
         } else {
-            throw `Language: ${language} not currently supported`;
+            throw `Language ${language} isn't currently supported`;
         }
 
+        // Send code to generator
         return {
             code: code,
             helperNames: [
@@ -193,7 +162,7 @@ class FindColor {
     }
 }
 
-// Returns a new findColor with id as the id
+// Returns a new findObjects with id as the id
 export function instance(argmap) {
-    return new FindColor(argmap);
+    return new FindObjects(argmap);
 }

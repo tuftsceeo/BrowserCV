@@ -203,6 +203,10 @@ function thresholdHelper(language) {
             `\t\ttest2.delete();`,
             `\t\trgba.delete();`,
             `\t\tmerged.delete();`,
+            ``,
+            `\t\t// Restore image back to color`,
+            `\t\tcv.cvtColor(img, img, cv.COLOR_GRAY2BGRA);`,
+            ``,
             `\t\tbreak;`,
             `\tdefault:`,
             `\t\tconsole.log("No thresh value worked");`,
@@ -271,21 +275,27 @@ function circleObjectsHelper(language) {
 
     if (language == "JavaScript") {
         code += "// Circle objects helper function \n";
-        code += `function circleObjectsHelper(img_in, max_objects, min_size, max_size) {
+        code += `function circleObjectsHelper(img, max_objects, min_size, max_size) {
 \t// setup
 \tlet contours = new cv.MatVector();
 \tlet hierarchy = new cv.Mat();
 \tlet circle_list = []; // tmp empty array for holding list
-        
+
+\t// Make image greyscale (to prevent errors)
+\tcv.cvtColor(img, img, cv.COLOR_RGBA2GRAY);
+
 \t// find contours
 \tcv.findContours(
-\t\timg_in,
+\t\timg,
 \t\tcontours,
 \t\thierarchy,
 \t\tcv.RETR_CCOMP,
 \t\tcv.CHAIN_APPROX_SIMPLE
 \t);
-        
+
+\t// Reset image to full color
+\tcv.cvtColor(img, img, cv.COLOR_GRAY2BGRA);
+
 \t// go through contours
 \tif (contours.size() > 0) {
 \t\tfor (let i = 0; i < contours.size(); i++) {
@@ -326,9 +336,6 @@ function drawCirclesHelper(language) {
     if (language == "JavaScript") {
         code += "// Draw circles helper function \n";
         code += `function drawCirclesHelper(img, circles) {
-\t// Makes the image a color image so we can draw on it
-\tcv.cvtColor(img, img, cv.COLOR_GRAY2BGRA);
-        
 \t//draws circle and center
 \tlet yellow_color = new cv.Scalar(255, 255, 0, 255);
 \tcircles.forEach(function (circle) {

@@ -2,6 +2,14 @@
  * TODO: Bugs
  * -
  *
+ * TODO: Add tutorial (for each language)!
+ * - Move howToLinkOpenCV to a separate tutorial page
+ * - Also have explanation for setting everything up
+ *
+ * TODO: Change index page (should just be prototypev003)
+ * - Add links back to other prototypes for now
+ * - Add tutorial button (which brings up page-in-page popup?)
+ *
  * TODO: Improve functionality of FunctionQueue
  * - Swap two functions
  *
@@ -14,6 +22,16 @@
  * TODO: Add more languages
  * - python
  *
+ * TODO: CSS + Design
+ * - Make site look prettier
+ * - improve accessibility
+ * - Have canvas move as you scroll?
+ * - resizable text box
+ * - drag and drop?
+ * - buttons generate below latest addition as well (maybe just have another div under where buttons generate at first as well)
+ *
+ * TODO: About page?
+ *
  */
 
 "use strict";
@@ -24,15 +42,13 @@
  *
  */
 
-// Global variables to hold the size of the input
-var input_width = 320;
+// Global variables
+var input_width = 320; // Size of input and output
 var input_height = 240;
-// And output
 var output_width = 320;
 var output_height = 240;
-
-// Global variable to track when video is stopped by user
-var stopVideo = false;
+var stopVideo = false; // Video stopped by user
+let cvLoaded = false; // OpenCV has loaded
 
 // Import functions used here
 let codeLine, generateCode, copyToClip;
@@ -56,6 +72,7 @@ let processingFunctions = [
     "greyscale",
     "findColor",
     "backgroundSubtract",
+    "findObjects",
 ];
 
 // Used in internal testing of the generateCode function. Paste generateCode function into console then set to true via console to see what generateCode function is doing
@@ -158,12 +175,32 @@ function start_video(video_id) {
 function repeatProcess(video_id, dest_id) {
     // Setup
     let video_canvas = document.getElementById(video_id);
-    let img = new cv.Mat(video_canvas.height, video_canvas.width, cv.CV_8UC4);
     let cap = new cv.VideoCapture(video_canvas);
     let begin = Date.now();
     var dst_canvas = document.getElementById(dest_id);
     dst_canvas.setAttribute("width", output_width);
     dst_canvas.setAttribute("height", output_height);
+
+    // If page loads faster than OpenCV causing error, try again
+    let img;
+    if (cvLoaded) {
+        img = new cv.Mat(video_canvas.height, video_canvas.width, cv.CV_8UC4);
+    } else {
+        try {
+            img = new cv.Mat(
+                video_canvas.height,
+                video_canvas.width,
+                cv.CV_8UC4
+            );
+            cvLoaded = true;
+        } catch (error) {
+            console.log(
+                `Error loading OpenCV. Trying again. Encountered: ${error}`
+            );
+            setTimeout(repeatProcess, 100, video_id, dest_id);
+            return;
+        }
+    }
 
     try {
         // Generate this frame
@@ -186,6 +223,7 @@ function repeatProcess(video_id, dest_id) {
     let elapsed = Date.now() - begin;
     let allowedDelay = 1000 / fps;
     let delay = allowedDelay - elapsed;
+
     // Warn if frame took too long to generate
     if (delay < 0) {
         console.log(

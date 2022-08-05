@@ -1,30 +1,4 @@
 /**
- * TODO: Make functions classes
- * - Put classes in separate file as modules & export them
- *      - each class should have an .execute(), a .render(), a .showCode()
- * - Import classes from separate files (in folder) into main js file
- * - Have each module reference an html file (in html folder) that has html for
- *   the settings box for that class
- *
- * TODO: Improve functionality of FunctionQueue
- * - Swap two functions
- * - Delete function at index
- * - Insert function at index
- * -
- *
- * TODO: Do all the generating code stuff
- * - function that runs through queue and calls .showCode()
- * - makes sure parameters etc. are linked up
- * - have library of functions for copy/paste?
- *
- * TODO: Add more functions:
- * - Threshold: make RGB/All not text box, make value a slider
- * - a way to find objects in scene
- *   - contours
- *   - min enclosing circles within threshold min/max
- *   - # of objects
- *   - positions of objects
- * - eventually code where user can do something if object is within an rect
  *
  * TODO: css & making the site look pretty
  * - Backgrounds to differentiate the sections

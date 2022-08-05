@@ -76,6 +76,9 @@ export function threshold(img, type, threshold, color = "red") {
             test2.delete();
             rgba.delete();
             merged.delete();
+
+            // Restore image back to color
+            cv.cvtColor(img, img, cv.COLOR_GRAY2BGRA);
             break;
         default:
             console.log("No thresh value worked");
@@ -90,20 +93,26 @@ export function greyscale(img) {
 }
 
 // Function which finds and returns max_objects number of minimum enclosing circles around contours in img_in whose radii are between min_size and max_size
-export function circleObjects(img_in, max_objects, min_size, max_size) {
+export function circleObjects(img, max_objects, min_size, max_size) {
     // setup
     let contours = new cv.MatVector();
     let hierarchy = new cv.Mat();
     let circle_list = []; // tmp empty array for holding list
 
+    // Make image greyscale (to prevent errors)
+    cv.cvtColor(img, img, cv.COLOR_RGBA2GRAY);
+
     // find contours
     cv.findContours(
-        img_in,
+        img,
         contours,
         hierarchy,
         cv.RETR_CCOMP,
         cv.CHAIN_APPROX_SIMPLE
     );
+
+    // Reset image to full color
+    cv.cvtColor(img, img, cv.COLOR_GRAY2BGRA);
 
     // go through contours
     if (contours.size() > 0) {
@@ -131,9 +140,6 @@ export function circleObjects(img_in, max_objects, min_size, max_size) {
 
 // Function which draws circles on an image
 export function drawCircles(img, circles) {
-    // Makes the image a color image so we can draw on it
-    cv.cvtColor(img, img, cv.COLOR_GRAY2BGRA);
-
     //draws circle and center
     let yellow_color = new cv.Scalar(255, 255, 0, 255);
     circles.forEach(function (circle) {

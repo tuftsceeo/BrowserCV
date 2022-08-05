@@ -3,30 +3,6 @@
         ID: ${id}$ Name: ${name}$
         <button onclick="functionQueue.removeWithID( '${id}$' );">X</button>
     </p>
-
-    <label for="${id}$color"> Pick a color to find: </label>
-    <select type="text" id="${id}$color" name="${id}$color" value="all">
-        <option value="red">red</option>
-        <option value="green">green</option>
-        <option value="blue">blue</option>
-    </select>
-
-    <p>
-        <label for="${id}$thresh">
-            How bright the object has to be to stand out
-        </label>
-    </p>
-    <input
-        type="range"
-        id="${id}$thresh"
-        name="${id}$thresh"
-        value="30"
-        min="0"
-        max="255"
-        style="width: 75%"
-    />
-    <span id="${id}$threshValue">30</span>
-
     <p>
         <label for="${id}$minsize"> Minimum Size of Enclosing Circle </label>
     </p>
