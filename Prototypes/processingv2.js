@@ -75,8 +75,9 @@ let processingFunctions = [
     "findObjects",
 ];
 
-// Used in internal testing of the generateCode function. Paste generateCode function into console then set to true via console to see what generateCode function is doing
+// Used in internal testing of the generateCode function
 let test = false;
+let processImage;
 
 /*
  *
@@ -239,14 +240,95 @@ function repeatProcess(video_id, dest_id) {
 
 // Iterates through each processing step before showing final image
 function doProcess(img) {
-    // For debugging generateCode
+    // For debugging
+    // Make a copy of img and apply generateCode's function to it
+    let testImage;
     if (test) {
-        // Do predefined function on img
-        console.log(processImage(img));
+        testImage = img.clone();
+        const outputs = processImage(testImage);
+        console.log(outputs);
+    }
+
+    // Apply currently defined functions to img
+    for (let i = 0; i < functionQueue.len; i++) {
+        functionQueue.function_at(i).execute(img);
+    }
+
+    // For debugging
+    // See if the two functions produce the same result
+    if (test) {
+        // Show images in debug area
+        cv.imshow("test1", img);
+        cv.imshow("test2", testImage);
+
+        let message = "Images are ";
+        const similar = areSameImg(img, testImage);
+        const same = similar.areSame;
+        if (same) {
+            message = "eqiuvalent ✔️";
+        } else {
+            message = `NOT equivalent ❌ - ${similar.count} differences`;
+        }
+        console.log(message);
+
+        // Clean up
+        testImage.delete();
+    }
+}
+
+// Function for testing code generated
+function testCode() {
+    // Setup
+    test = !test;
+    let button = document.getElementById("testCode");
+    let fps = document.getElementById("fps");
+    let testImgArea = document.getElementById("showTestImgs");
+    if (test) {
+        button.innerHTML = "Stop"; // Change button
+        fps.value = 1; // Lower FPS
+
+        // Generate code and run it
+        let code = generateCode(functionQueue, "output_code", test);
+        console.log(code);
+        eval(code); // !Remove for working release
+
+        // Create 2 canvasses on page to compare images visually
+        let canvas1 = document.createElement("canvas");
+        let canvas2 = document.createElement("canvas");
+        canvas1.id = "test1";
+        canvas2.id = "test2";
+        testImgArea.appendChild(canvas1);
+        testImgArea.appendChild(canvas2);
     } else {
-        // Let user change functions applied to img
-        for (let i = 0; i < functionQueue.len; i++) {
-            functionQueue.function_at(i).execute(img);
+        button.innerHTML = "Test"; // Reset button
+        fps.value = 15; // Reset FPS
+
+        // Remove canvasses
+        let canvas1 = document.getElementById("test1");
+        let canvas2 = document.getElementById("test2");
+        testImgArea.removeChild(canvas1);
+        testImgArea.removeChild(canvas2);
+    }
+}
+
+// Function that checks if two images are the same
+function areSameImg(img1, img2) {
+    let areSame = true;
+
+    // Check if images are same size
+    if (img1.data.length != img2.data.length) {
+        areSame = false;
+    }
+
+    let count = 0;
+    // Check if any element are different
+    for (let i = 0; i < img1.data.length; i++) {
+        if (img1.data[i] != img2.data[i]) {
+            areSame = false;
+            count++;
         }
     }
+
+    // Must be the same
+    return { areSame, count };
 }

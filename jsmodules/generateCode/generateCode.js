@@ -4,7 +4,7 @@
 import * as mh from "../moduleSetup/moduleHelper.js"; // if needed
 
 // Generate code for user
-export function generateCode(functionQueue, dest_id) {
+export function generateCode(functionQueue, dest_id, test = false) {
     // Setup
     const dest = document.getElementById(dest_id);
     const language = document.getElementById("generateCodeLanguage").value;
@@ -24,10 +24,15 @@ export function generateCode(functionQueue, dest_id) {
     }
 
     // Insert each function's code into one big function
-    code += makeFunction(language, toInsert);
+    code += makeFunction(language, toInsert, test);
 
-    // Write code on page
-    dest.value = code;
+    // For debugging
+    if (test) {
+        return code;
+    } else {
+        // Write code on page
+        dest.value = code;
+    }
 }
 
 // Helper function for generateCode()
@@ -370,14 +375,19 @@ function drawCirclesHelper(language) {
 
 // Helper function for generateCode()
 // Returns code for overall image processing function
-function makeFunction(language, toInsert) {
+function makeFunction(language, toInsert, test = false) {
     let code = "";
 
     if (language == "JavaScript") {
         code += `// Takes in variable containing openCV image and modifies it
-// Returns any function outputs (such as coordinates of objects)
-function processImage(img) { 
-\t// Setup
+// Returns any function outputs (such as coordinates of objects)\n`;
+        // for debugging
+        if (test) {
+            code += `processImage = function(img) {\n`;
+        } else {
+            code += `function processImage(img) {\n`;
+        }
+        code += `\t// Setup
 \tlet outputs = {}; 
 ${toInsert}
 \t// Return outputs of sub functions
