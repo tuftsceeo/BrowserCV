@@ -73,3 +73,11 @@ export function copyToClip(targetId, buttonId, parentId) {
         }
     }
 }
+
+// Removes all child divs of target div
+// Code via https://www.javascripttutorial.net/dom/manipulating/remove-all-child-nodes/
+export function removeChildren(target) {
+    while (target.firstChild) {
+        target.removeChild(target.firstChild);
+    }
+}

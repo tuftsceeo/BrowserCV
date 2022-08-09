@@ -1,0 +1,26 @@
+<blockquote>
+    ID: ${id}$ Name: ${name}$
+    <button onclick="functionQueue.removeWithID( '${id}$' );">X</button>
+    <br />
+
+    <label for="${id}$outputFrom"> Use output from: </label>
+    <select id="${id}$outputFrom">
+        <!-- <option value="none">none</option> -->
+    </select>
+    <br />
+
+    Pick a grid size:
+    <br />
+    <label for="${id}$width"> Width </label>
+    <input value="4" id="${id}$width" type="number" min="1" />
+    <br />
+    <label for="${id}$height"> Height </label>
+    <input value="4" id="${id}$height" type="number" min="1" />
+    <br />
+    If an object is in a grid zone add how much to the total? <br />
+    <table id="${id}$grid" class="grid"></table>
+    <br />
+
+    Total: <span id="${id}$total">0</span> <br />
+    <b>Outputs: circle around found objects</b><br />
+</blockquote>

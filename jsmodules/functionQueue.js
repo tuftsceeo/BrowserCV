@@ -97,6 +97,17 @@ class FunctionQueue {
         }
         console.log("No function found with id", id);
     }
+
+    // Returns array containing IDs of functions with outputs
+    functionIdsWithOutput() {
+        let toReturn = [];
+        this.functions.forEach((func) => {
+            if (func.outputs) {
+                toReturn.push(func.id);
+            }
+        });
+        return toReturn;
+    }
 }
 
 // Returns new FunctionQueue

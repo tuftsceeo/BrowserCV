@@ -1,8 +1,6 @@
 <blockquote>
-    <p>
-        ID: ${id}$ Name: ${name}$
-        <button onclick="functionQueue.removeWithID( '${id}$' );">X</button>
-    </p>
+    ID: ${id}$ Name: ${name}$
+    <button onclick="functionQueue.removeWithID( '${id}$' );">X</button> <br />
 
     <label for="${id}$color"> Pick a color to find: </label>
     <select type="text" id="${id}$color" name="${id}$color" value="all">
@@ -11,11 +9,11 @@
         <option value="blue">blue</option>
     </select>
 
-    <p>
-        <label for="${id}$thresh">
-            How bright the object has to be to stand out
-        </label>
-    </p>
+    <label for="${id}$thresh">
+        How bright the object has to be to stand out
+    </label>
+    <br />
+
     <input
         type="range"
         id="${id}$thresh"
@@ -27,9 +25,9 @@
     />
     <span id="${id}$threshValue">30</span>
 
-    <p>
-        <label for="${id}$minsize"> Minimum Size of Enclosing Circle </label>
-    </p>
+    <label for="${id}$minsize"> Minimum Size of Enclosing Circle </label>
+    <br />
+
     <input
         type="range"
         id="${id}$minsize"
@@ -41,9 +39,9 @@
     />
     <span id="${id}$minsizeValue">20</span>
 
-    <p>
-        <label for="${id}$maxsize"> Maximum Size of Enclosing Circle </label>
-    </p>
+    <label for="${id}$maxsize"> Maximum Size of Enclosing Circle </label>
+    <br />
+
     <input
         type="range"
         id="${id}$maxsize"
@@ -55,11 +53,9 @@
     />
     <span id="${id}$maxsizeValue">100</span>
 
-    <p>
-        <label for="${id}$maxnum">
-            Maximum Number of Objects to Look For
-        </label>
-    </p>
+    <label for="${id}$maxnum"> Maximum Number of Objects to Look For </label>
+    <br />
+
     <input
         type="range"
         id="${id}$maxnum"
@@ -71,19 +67,16 @@
     />
     <span id="${id}$maxnumValue">4</span>
 
-    <p>
-        <label for="${id}$visualize"> Visualize Circles </label>
-        <input
-            type="checkbox"
-            id="${id}$visualize"
-            name="${id}$visualize"
-            value="true"
-            checked
-        />
-    </p>
-    <p>
-        <b>Outputs: Coordinates of found objects</b>
-    </p>
+    <label for="${id}$visualize"> Visualize Circles </label>
+    <input
+        type="checkbox"
+        id="${id}$visualize"
+        name="${id}$visualize"
+        value="true"
+        checked
+    />
+    <br />
 
+    <b>Outputs: circle around found objects</b>
     <br />
 </blockquote>

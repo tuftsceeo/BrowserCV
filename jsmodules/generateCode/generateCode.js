@@ -101,6 +101,8 @@ function insertHelperFuncs(language, allHelperNames) {
         circleObjects: circleObjectsHelper,
         drawCircles: drawCirclesHelper,
         backgroundSubtract: backgroundSubtractHelper,
+        font: fontHelper,
+        green: greenHelper,
     };
 
     // Add helper functions in allHelperNames
@@ -242,6 +244,40 @@ function greyscaleHelper(language) {
         code += codeLine(`cv.cvtColor(img, img, cv.COLOR_BGRA2GRAY);`);
         code += codeLine("cv.cvtColor(img, img, cv.COLOR_GRAY2BGRA);");
         code += "}\n";
+    } else {
+        // TODO: Add functionality for more languages
+        throw `ERROR: Language ${language} is not supported yet`;
+    }
+
+    return code;
+}
+
+// Returns code defining font for objectInGrid
+// Helper function for insertHelperFuncs
+function fontHelper(language) {
+    // Setup
+    let code = "";
+
+    if (language == "JavaScript") {
+        code += "// Define font\n";
+        code += "const font = cv.FONT_HERSHEY_SIMPLEX;\n";
+    } else {
+        // TODO: Add functionality for more languages
+        throw `ERROR: Language ${language} is not supported yet`;
+    }
+
+    return code;
+}
+
+// Returns code defining green for objectInGrid
+// Helper function for insertHelperFuncs
+function greenHelper(language) {
+    // Sestup
+    let code = "";
+
+    if (language == "JavaScript") {
+        code += "// Define green\n";
+        code += "const green = new cv.Scalar(0, 255, 0, 255);\n";
     } else {
         // TODO: Add functionality for more languages
         throw `ERROR: Language ${language} is not supported yet`;
@@ -393,7 +429,9 @@ function makeFunction(language, toInsert, test = false) {
             code += `function processImage(img) {\n`;
         }
         code += `\t// Setup
-\tlet outputs = {}; 
+\tlet outputs = {};
+\tconst input_width = 320; // Change to fit video
+\t const input_height = 240; // canvas dimensions
 ${toInsert}
 \t// Return outputs of sub functions
 \treturn outputs;

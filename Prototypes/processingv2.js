@@ -26,12 +26,13 @@
  * - Make site look prettier
  * - improve accessibility
  * - Have canvas move as you scroll?
+ * - Minimize a function on the queue (do blockquote.style.display = none)
  * - resizable text box
  * - drag and drop?
  * - buttons generate below latest addition as well (maybe just have another div under where buttons generate at first as well)
  *
  * TODO: About page?
- *
+ * - Privacy policy (just saying we don't collect data?)
  */
 
 "use strict";
@@ -73,6 +74,7 @@ let processingFunctions = [
     "findColor",
     "backgroundSubtract",
     "findObjects",
+    "objectInGrid",
 ];
 
 // Used in internal testing of the generateCode function
