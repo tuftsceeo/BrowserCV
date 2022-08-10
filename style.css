@@ -75,3 +75,8 @@ blockquote {
     padding-left: 0.5em;
     padding-right: 0.5em;
 }
+
+.btn-primary {
+    background-color: #536dcb;
+    border-color: #536dcb;
+}
