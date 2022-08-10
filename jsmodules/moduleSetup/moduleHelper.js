@@ -13,6 +13,13 @@ export async function loadCode(url, moduleCode) {
 
 // Takes in module's HTML code for display interface, replaces variables with their values, and inserts interface onto page
 export function displayInterface(destinationElement, id, HTMLcode) {
+    // Setup
+    let newDiv = document.createElement("div");
+    newDiv.id = id;
+    newDiv.classList.add("section");
+    // newDiv.classList.add("row");
+    document.getElementById("visibleQueue").appendChild(newDiv);
+
     // Replaces ${string}$ in the HTML with value of function[string] in Queue
     const reg = /\${(\w+)}\$/gi;
     let match = HTMLcode.match(reg);
@@ -26,7 +33,7 @@ export function displayInterface(destinationElement, id, HTMLcode) {
     }
 
     // Puts interface in destinationElement
-    destinationElement.innerHTML = HTMLcode;
+    newDiv.innerHTML = HTMLcode;
 }
 
 // Formats a line of code for generateCode functions

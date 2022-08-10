@@ -31,12 +31,16 @@ export function render(destinationElement, id) {
     let thisFunc = functionQueue.functionWithID(id);
     thisFunc.params.outputFromId = outputSelect.value;
 
-    outputSelect.addEventListener("click", function () {
+    outputSelect.addEventListener("input", function () {
+        // Save their selection
+        const selection = outputSelect.value;
+
         // Check if output options have changed and change them
         addOutputOptions(outputSelect, id, true);
 
         // Record user's choice
-        thisFunc.params.outputFromId = outputSelect.value;
+        thisFunc.params.outputFromId = selection;
+        outputSelect.value = selection;
     });
 
     // Add initial 4x4 grid squares

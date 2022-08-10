@@ -6,24 +6,17 @@
  * - Move howToLinkOpenCV to a separate tutorial page
  * - Also have explanation for setting everything up
  *
- * TODO: Change index page (should just be prototypev003)
- * - Add links back to other prototypes for now
- * - Add tutorial button (which brings up page-in-page popup?)
- *
  * TODO: Improve functionality of FunctionQueue
  * - Swap two functions
  *
  * TODO: Add more functions:
- * - Re-add findObjects
  * - Something using the radius of an object to find its size
- * - Location of object within 3x3 grid, passes back 1-9
  * - Motional detection (subtracts one frame from another)
  *
  * TODO: Add more languages
  * - python
  *
  * TODO: CSS + Design
- * - Make site look prettier
  * - improve accessibility
  * - Have canvas move as you scroll?
  * - Minimize a function on the queue (do blockquote.style.display = none)
@@ -68,14 +61,38 @@ import("../jsmodules/functionQueue.js").then((Module) => {
 });
 
 // List of functions that exist to import
-let processingFunctions = [
-    "threshold",
-    "greyscale",
-    "findColor",
-    "backgroundSubtract",
-    "findObjects",
-    "objectInGrid",
-];
+const processingFunctions = {
+    threshold: {
+        fileName: "threshold",
+        order: 2,
+        buttonColor: `btn-outline-dark`,
+    },
+    greyscale: {
+        fileName: "greyscale",
+        order: 1,
+        buttonColor: `btn-outline-dark`,
+    },
+    "find color": {
+        fileName: "findColor",
+        order: 5,
+        buttonColor: `btn-primary`,
+    },
+    "subtract background": {
+        fileName: "backgroundSubtract",
+        order: 3,
+        buttonColor: `btn-outline-dark`,
+    },
+    "find objects": {
+        fileName: "findObjects",
+        order: 4,
+        buttonColor: `btn-primary`,
+    },
+    "is object in grid": {
+        fileName: "objectInGrid",
+        order: 6,
+        buttonColor: `btn-outline-success`,
+    },
+};
 
 // Used in internal testing of the generateCode function
 let test = false;
@@ -89,12 +106,18 @@ let processImage;
 
 // Generates button on page for a given function module
 function addButton(ModulePointer) {
-    // destination div
-    let buttonDiv = document.getElementById("buttons");
+    // Setup
+    const name = ModulePointer.moduleName;
+    console.log(`Name: ${name}`);
+    const topButtonDiv = document.getElementById("topButtons");
+    const bottomButtonDiv = document.getElementById("bottomButtons");
+    bottomButtonDiv.style.display = "none";
+
     // create new button
     let button = document.createElement("button");
-    button.id = ModulePointer.moduleName;
-    button.innerHTML = "Add " + ModulePointer.moduleName;
+    button.innerHTML = "Add " + name;
+    styleButton(button, name);
+    let copyOfButton = button.cloneNode(true);
 
     // Adds function to functionQueue when clicked & generates interface
     button.addEventListener("click", () => {
@@ -102,17 +125,51 @@ function addButton(ModulePointer) {
         let id = functionQueue.add(ModulePointer);
         if (!id) {
             console.log(
-                `Error adding ${ModulePointer.moduleName}, functionQueue.add didn't return an ID`
+                `Error adding ${name}, functionQueue.add didn't return an ID`
+            );
+        }
+        ModulePointer.render("visibleQueue", id);
+        checkBottomButtonVisibility();
+    });
+    copyOfButton.addEventListener("click", () => {
+        // add to functionQueue
+        let id = functionQueue.add(ModulePointer);
+        if (!id) {
+            console.log(
+                `Error adding ${name}, functionQueue.add didn't return an ID`
             );
         }
         // render interface
-        let newDiv = document.createElement("div");
-        newDiv.id = id;
-        newDiv.classList.add("section"); // add class "section" for styling
-        document.getElementById("visibleQueue").appendChild(newDiv);
-        ModulePointer.render(newDiv, id);
+        ModulePointer.render("visibleQueue", id);
+        checkBottomButtonVisibility();
     });
-    buttonDiv.appendChild(button); // add button to page
+
+    // Create columns to hold buttons
+    const column = document.createElement("div");
+    column.classList.add("col");
+    column.classList.add("btn-col");
+    addOrder(column, name);
+    const copyOfColumn = column.cloneNode(true);
+    column.appendChild(button);
+    copyOfColumn.appendChild(copyOfButton);
+
+    // Put buttons on page
+    topButtonDiv.appendChild(column);
+    bottomButtonDiv.appendChild(copyOfColumn);
+}
+
+// Helper function for addButton
+// Adds bootstrap styling to button
+function styleButton(button, name) {
+    button.classList.add(`btn`);
+    button.classList.add(processingFunctions[name].buttonColor);
+}
+
+// Helper function for addButton
+// Adds horizontal ordering (via order class) to columns for buttons
+function addOrder(column, name) {
+    const orderStyle = `order: ${processingFunctions[name].order}!important;`;
+    column.style.cssText += orderStyle;
 }
 
 // Makes sure all imported modules have the values and functions they need
@@ -132,8 +189,9 @@ function checkModuleContents(Module, name) {
 // Import all the functions from their modules and add buttons to page
 window.onload = function () {
     // Load all our processing functions
-    processingFunctions.forEach(function (name) {
-        var path = "../jsmodules/" + name + ".js";
+    for (const property in processingFunctions) {
+        const name = processingFunctions[property].fileName;
+        const path = "../jsmodules/" + name + ".js";
         console.log("- about to load: " + name + " from " + path);
         import(path).then((Module) => {
             // Makes sure module has the exports I need
@@ -143,12 +201,43 @@ window.onload = function () {
             // Adds "add function" button to page
             addButton(Module);
         });
-    });
+    }
 
     // Start video and processing
     start_video("video");
     repeatProcess("video", "fin_dest");
 };
+
+/*
+ *
+ * UI
+ *
+ */
+
+// Shows or hides bottom buttons depending on queue length
+function checkBottomButtonVisibility() {
+    // Setup
+    const bottomButtonDiv = document.getElementById("bottomButtons");
+    const lengthToHide = 0;
+
+    if (functionQueue.length > lengthToHide) {
+        bottomButtonDiv.style.display = "flex";
+    } else {
+        bottomButtonDiv.style.display = "none";
+    }
+}
+
+function toggleInterfaceMinimize(id) {
+    const body = document.getElementById(id + `interfaceBody`);
+    const button = document.getElementById(id + `toggleMinimize`);
+    if (button.innerHTML.includes("-")) {
+        body.style.display = "none";
+        button.innerHTML = "+";
+    } else {
+        body.style.display = "block";
+        button.innerHTML = "-";
+    }
+}
 
 /*
  *
