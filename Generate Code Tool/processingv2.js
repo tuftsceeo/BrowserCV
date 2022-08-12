@@ -1,6 +1,13 @@
 /**
  * TODO: Bugs
- * -s
+ * -
+ *
+ * TODO: Improve Help with example tutorials
+ * - For example certain combinations of functions that do:
+ *      - Detect if object is in L or R using is object in grid
+ *          - Using either 0.1 and 1.1 or 2 functions
+ *      - Detect where object is in 3x3 using 1-9
+ *      - etc.
  *
  * TODO: Improve functionality of FunctionQueue
  * - Swap two functions
@@ -22,6 +29,7 @@
  * TODO: About page?
  * - Privacy policy (just saying we don't collect data?)
  * - License? (MIT? Apache?)
+ *
  */
 
 "use strict";
