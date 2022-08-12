@@ -80,3 +80,22 @@ blockquote {
     background-color: #536dcb;
     border-color: #536dcb;
 }
+
+.pre-scrollable {
+    max-height: 340px;
+    overflow-y: scroll;
+}
+
+textarea,
+.code-highlight {
+    background-color: #f6f6f6;
+}
+
+.row-help-section {
+    padding-top: 3%;
+    padding-bottom: 3%;
+}
+
+.row-help-subsection {
+    padding-top: 2%;
+}

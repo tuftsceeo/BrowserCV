@@ -1,31 +1,27 @@
 /**
  * TODO: Bugs
- * -
- *
- * TODO: Add tutorial (for each language)!
- * - Move howToLinkOpenCV to a separate tutorial page
- * - Also have explanation for setting everything up
+ * -s
  *
  * TODO: Improve functionality of FunctionQueue
  * - Swap two functions
  *
  * TODO: Add more functions:
  * - Something using the radius of an object to find its size
- * - Motional detection (subtracts one frame from another)
+ * - Erase everything outside/inside object circles (using mask)
  *
  * TODO: Add more languages
- * - python
+ * - python (+ tutorial)
  *
  * TODO: CSS + Design
  * - improve accessibility
  * - Have canvas move as you scroll?
- * - Minimize a function on the queue (do blockquote.style.display = none)
- * - resizable text box
+ * - resizable text box?
  * - drag and drop?
- * - buttons generate below latest addition as well (maybe just have another div under where buttons generate at first as well)
+ * - Make mobile hamburger thing work in navbar
  *
  * TODO: About page?
  * - Privacy policy (just saying we don't collect data?)
+ * - License? (MIT? Apache?)
  */
 
 "use strict";

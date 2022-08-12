@@ -10,9 +10,6 @@ export function generateCode(functionQueue, dest_id, test = false) {
     const language = document.getElementById("generateCodeLanguage").value;
     let code = "";
 
-    // Tell how to get OpenCV
-    code += howToLinkOpenCV(language);
-
     // Get code and which helper functions are used from each function in functionQueue
     let returnedFromFunctions = getFunctionCode(language, functionQueue);
     let toInsert = returnedFromFunctions.toInsert;
@@ -31,7 +28,7 @@ export function generateCode(functionQueue, dest_id, test = false) {
         return code;
     } else {
         // Write code on page
-        dest.value = code;
+        dest.innerHTML = code;
     }
 }
 
@@ -73,21 +70,6 @@ function getFunctionCode(language, functionQueue) {
     });
 
     return { toInsert: toInsert, allHelperNames: allHelperNames };
-}
-
-// Helper function for generateCode()
-// Returns comment explaining how to link OpenCV functions
-function howToLinkOpenCV(language) {
-    if (language == "JavaScript") {
-        return `// Needs accompanying HTML to function:
-/*<script
-\ttype="text/javascript"
-\tsrc="https://docs.opencv.org/master/opencv.js"
-></script>*/ \n\n`;
-    } else {
-        // TODO: Add support for more languages
-        throw `ERROR: language: ${language} not supported yet`;
-    }
 }
 
 // Helper function for generateCode()
@@ -431,7 +413,7 @@ function makeFunction(language, toInsert, test = false) {
         code += `\t// Setup
 \tlet outputs = {};
 \tconst input_width = 320; // Change to fit video
-\t const input_height = 240; // canvas dimensions
+\tconst input_height = 240; // canvas dimensions
 ${toInsert}
 \t// Return outputs of sub functions
 \treturn outputs;
