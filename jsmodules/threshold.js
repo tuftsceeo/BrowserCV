@@ -48,6 +48,7 @@ export function render(destinationElement, id) {
             colorSelector.style.display = "block";
         } else if (this.value == "adaptive") {
             threshValueSelect.max = 50;
+            colorSelector.style.display = "none";
         } else {
             colorSelector.style.display = "none";
             threshValueSelect.max = 255;

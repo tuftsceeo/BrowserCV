@@ -59,6 +59,8 @@ function getFunctionCode(language, functionQueue) {
         // Check for common helper functions
         if (fromFunc.helperNames) {
             fromFunc.helperNames.forEach(function (helperName) {
+                 // Check if we have the helper already. A -1 return value
+                 // means we don't
                 if (allHelperNames.indexOf(helperName) == -1) {
                     allHelperNames.push(helperName);
                 }
@@ -298,7 +300,6 @@ function greenHelper(language) {
     } else if (language == "Python") {
         code += "green = (0, 255, 0)\n";
     } else {
-        // TODO: Add functionality for more languages
         throw `ERROR: Language ${language} is not supported yet`;
     }
 
@@ -326,8 +327,8 @@ function backgroundSubtractHelper(language) {
         code += `try {
     fgbg.delete()
 } catch (error) {
-
-}`;
+    // Do nothing
+}\n`;
         code += "var fgbg = new cv.BackgroundSubtractorMOG2(500, 16, true);\n";
     } else if (language == "Python") {
         code += "fgbg = createBackgroundSubtractorMOG2(500, 16, True)\n";
@@ -458,7 +459,10 @@ function drawCirclesHelper(language) {
         code += `def drawCirclesHelper(img, circles):
     yellow = (0, 255, 255)
     for circle in circles:
-        # Draw circle & Center
+        # Draw circle & center
+        # center and radius need to be a tuple of integers, and an integer
+        circle["center"] = (int(circle["center"][0]), int(circle["center"][0]))
+        circle["radius"] = int(circle["radius"])
         cv.circle(img, circle["center"], circle["radius"], yellow, 2) #NOT SURE
         cv.circle(img, circle["center"], 1, yellow, 1)
         

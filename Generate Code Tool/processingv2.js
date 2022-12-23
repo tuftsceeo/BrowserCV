@@ -1,6 +1,8 @@
 /**
  * TODO: Bugs
- * -
+ * - onImageActions.circleObjects makes the image black and white. Should deep
+ *   copy the image, then make the copy black and white, then do actions, then
+ *   return the circles, not modify original image
  *
  * TODO: Improve Help with example tutorials
  * - For example certain combinations of functions that do:

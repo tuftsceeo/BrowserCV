@@ -13,7 +13,6 @@ import * as mh from "./moduleSetup/moduleHelper.js"; // for module setup
 export let moduleName = "subtract background";
 
 // internal variables:
-// TODO: function interface
 let moduleCodePath = "../Function Interfaces/backgroundSubtractInterface.html";
 // onload of module, get moduleCode
 let moduleCode = { contents: null };
@@ -46,18 +45,26 @@ class BackgroundSubtract {
     generateCode(language) {
         // Setup
         let code = "";
+        let lines = [];
 
         if (language == "JavaScript") {
-            const lines = [
+            lines = [
                 `fgbg.apply(img, img);`,
                 `cv.cvtColor(img, img, cv.COLOR_GRAY2BGRA);`,
             ];
-            lines.forEach((line) => {
-                code += mh.codeLine(line);
-            });
-        } else {
+        } else if (language == "Python") {
+            lines = [
+                `img = fgbg.apply(img)`
+            ];
+        }
+        else {
             throw `Language: ${language} not currently supported`;
         }
+
+        // Format each code line
+        lines.forEach((line) => {
+            code += mh.codeLine(line);
+        });
 
         return {
             code: code,

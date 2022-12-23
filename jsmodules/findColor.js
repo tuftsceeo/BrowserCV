@@ -152,9 +152,10 @@ class FindColor {
     generateCode(language) {
         // Setup
         let code = "";
+        let lines = "";
 
         if (language == "JavaScript") {
-            const lines = [
+            lines = [
                 `// Threshold the image to the given brightness and color`,
                 `thresholdHelper(img, "color", ${this.brightness}, "${this.color}");`,
                 ``,
@@ -169,23 +170,44 @@ class FindColor {
                 `// Put each circle in outputs`,
                 `outputs.${this.id} = circles${this.id};`,
                 ``,
-                `// Visualize where contours are`,
+                `// Visualize where objects are`,
                 `if (${this.params.visualize}) {`,
                 `    drawCirclesHelper(img, circles${this.id});`,
                 `}`,
             ];
-            lines.forEach((line) => {
-                code += mh.codeLine(line);
-            });
+        } else if (language == "Python") {
+            lines = [
+                `# Threshold the image to the given brightness and color`,
+                `img = thresholdHelper(img, "color", ${this.brightness}, "${this.color}")`,
+                ``,
+                `# Get circles around objects`,
+                `circles${this.id} = circleObjectsHelper(`,
+                `    img,`,
+                `    ${this.maxnum},`,
+                `    ${this.minsize},`,
+                `    ${this.maxsize}`,
+                `);`,
+                ``,
+                `# Put each circle in outputs`,
+                `outputs["${this.id}"] = circles${this.id}`,
+                ``,
+                `# Visualize where the objects are`,
+                `if (${mh.pythonBoolString(this.params.visualize)}):`,
+                `    drawCirclesHelper(img, circles${this.id})`,
+                ``,
+            ];
         } else {
             throw `Language: ${language} not currently supported`;
         }
+
+        lines.forEach((line) => {
+            code += mh.codeLine(line);
+        });
 
         return {
             code: code,
             helperNames: [
                 "threshold",
-                "greyscale",
                 "circleObjects",
                 "drawCircles",
             ],

@@ -11,7 +11,8 @@ export async function loadCode(url, moduleCode) {
         });
 }
 
-// Takes in module's HTML code for display interface, replaces variables with their values, and inserts interface onto page
+// Takes in module's HTML code for display interface, replaces variables with
+// their values, and inserts interface onto page
 export function displayInterface(destinationElement, id, HTMLcode) {
     // Setup
     let newDiv = document.createElement("div");
@@ -39,6 +40,18 @@ export function displayInterface(destinationElement, id, HTMLcode) {
 // Formats a line of code for generateCode functions
 export function codeLine(code) {
     return `    ${code}\n`;
+}
+
+// Returns a string containing a boolean correctly formatted for Python
+// Used in generateCode member functions of image processing functions
+// for Python translation
+export function pythonBoolString(boolean) {
+    // In Python booleans are capitalized unlike JavaScript
+    if (boolean) {
+        return "True";
+    } else {
+        return "False";
+    }
 }
 
 // Copies value of passed id to clipboard

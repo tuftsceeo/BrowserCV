@@ -121,10 +121,11 @@ class FindObjects {
     generateCode(language) {
         // Setup
         let code = "";
+        let lines = [];
 
         // Check for language
         if (language == "JavaScript") {
-            const lines = [
+            lines = [
                 `// Get circles around objects`,
                 `let circles${this.id} = circleObjectsHelper(`,
                 `    img,`,
@@ -136,25 +137,42 @@ class FindObjects {
                 `// Put each circle in outputs`,
                 `outputs.${this.id} = circles${this.id};`,
                 ``,
-                `// Visualize where contours are`,
+                `// Visualize where objects are`,
                 `if (${this.params.visualize}) {`,
                 `    drawCirclesHelper(img, circles${this.id});`,
                 `}`,
             ];
-
-            lines.forEach((line) => {
-                code += mh.codeLine(line);
-            });
+        } else if (language == "Python") {
+            lines = [
+                `# Get circles around objects`,
+                `circles${this.id} = circleObjectsHelper(`,
+                `    img,`,
+                `    ${this.maxnum},`,
+                `    ${this.minsize},`,
+                `    ${this.maxsize}`,
+                `);`,
+                ``,
+                `# Put each circle in outputs`,
+                `outputs["${this.id}"] = circles${this.id}`,
+                ``,
+                `# Visualize where the objects are`,
+                `if (${mh.pythonBoolString(this.params.visualize)}):`,
+                `    drawCirclesHelper(img, circles${this.id})`,
+                ``,
+            ];
         } else {
             throw `Language ${language} isn't currently supported`;
         }
+        
+        // Format each code line
+        lines.forEach((line) => {
+            code += mh.codeLine(line);
+        });
 
         // Send code to generator
         return {
             code: code,
             helperNames: [
-                "threshold",
-                "greyscale",
                 "circleObjects",
                 "drawCircles",
             ],
