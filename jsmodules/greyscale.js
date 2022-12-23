@@ -44,6 +44,8 @@ class Greyscale {
         if (language == "JavaScript") {
             // Copy functionality from actions.js replacing variables with user's options
             code += mh.codeLine("greyscaleHelper(img);");
+        } else if (language == "Python") {
+            code += `    img = greyscaleHelper(img)\n`;
         } else {
             // TODO: Add other language support
             throw `ERROR: Language ${language} isn't supported yet`;

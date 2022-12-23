@@ -160,10 +160,10 @@ class FindColor {
                 ``,
                 `// Get circles around objects`,
                 `let circles${this.id} = circleObjectsHelper(`,
-                `\timg,`,
-                `\t${this.maxnum},`,
-                `\t${this.minsize},`,
-                `\t${this.maxsize}`,
+                `    img,`,
+                `    ${this.maxnum},`,
+                `    ${this.minsize},`,
+                `    ${this.maxsize}`,
                 `);`,
                 ``,
                 `// Put each circle in outputs`,
@@ -171,7 +171,7 @@ class FindColor {
                 ``,
                 `// Visualize where contours are`,
                 `if (${this.params.visualize}) {`,
-                `\tdrawCirclesHelper(img, circles${this.id});`,
+                `    drawCirclesHelper(img, circles${this.id});`,
                 `}`,
             ];
             lines.forEach((line) => {

@@ -114,8 +114,6 @@ function addButton(ModulePointer) {
     const name = ModulePointer.moduleName;
     console.log(`Name: ${name}`);
     const topButtonDiv = document.getElementById("topButtons");
-    const bottomButtonDiv = document.getElementById("bottomButtons");
-    bottomButtonDiv.style.display = "none";
 
     // create new button
     let button = document.createElement("button");
@@ -133,7 +131,6 @@ function addButton(ModulePointer) {
             );
         }
         ModulePointer.render("visibleQueue", id);
-        checkBottomButtonVisibility();
     });
     copyOfButton.addEventListener("click", () => {
         // add to functionQueue
@@ -145,7 +142,6 @@ function addButton(ModulePointer) {
         }
         // render interface
         ModulePointer.render("visibleQueue", id);
-        checkBottomButtonVisibility();
     });
 
     // Create columns to hold buttons
@@ -159,7 +155,6 @@ function addButton(ModulePointer) {
 
     // Put buttons on page
     topButtonDiv.appendChild(column);
-    bottomButtonDiv.appendChild(copyOfColumn);
 }
 
 // Helper function for addButton
@@ -217,19 +212,6 @@ window.onload = function () {
  * UI
  *
  */
-
-// Shows or hides bottom buttons depending on queue length
-function checkBottomButtonVisibility() {
-    // Setup
-    const bottomButtonDiv = document.getElementById("bottomButtons");
-    const lengthToHide = 0;
-
-    if (functionQueue.length > lengthToHide) {
-        bottomButtonDiv.style.display = "flex";
-    } else {
-        bottomButtonDiv.style.display = "none";
-    }
-}
 
 function toggleInterfaceMinimize(id) {
     const body = document.getElementById(id + `interfaceBody`);

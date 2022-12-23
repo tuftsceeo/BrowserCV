@@ -111,6 +111,10 @@ class Threshold {
             code += mh.codeLine(
                 `thresholdHelper(img, "${type}", ${value}, "${color}");`
             );
+        } else if (language == "Python") {
+            code += mh.codeLine(
+                `img = thresholdHelper(img, "${type}", ${value}, "${color}")`
+            );
         } else {
             // TODO: Add other language support
             throw `ERROR: Language ${language} isn't supported yet`;

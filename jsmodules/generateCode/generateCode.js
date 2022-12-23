@@ -43,17 +43,14 @@ function getFunctionCode(language, functionQueue) {
 
     // Iterate through functionQueue getting code for each function
     functionQueue.funcs.forEach(function (func) {
-        // Announcements
+        // Announce which function
         console.log(`Writing code for ${func.id}: ${func.name}`);
-        toInsert += "\n";
-        if (language == "JavaScript") {
-            toInsert += mh.codeLine(
-                `// Code for function: ${func.name} ID: ${func.id}`
-            );
-        } else {
-            // TODO: Add support for more languages
-            throw `ERROR: language: ${language} not supported yet`;
-        }
+        toInsert += mh.codeLine(
+            codeComment(
+                language,
+                `Code for function: ${func.name} ID: ${func.id}`
+            )
+        );
 
         // Have function generate it's own code
         let fromFunc = func.generateCode(language);
@@ -76,7 +73,7 @@ function getFunctionCode(language, functionQueue) {
 // Returns code for all helper functions
 function insertHelperFuncs(language, allHelperNames) {
     // Setup
-    let code = "";
+    let code = codeComment(language, `--- Some Helper Functions --- \n`);
     let helperFuncLookup = {
         threshold: thresholdHelper,
         greyscale: greyscaleHelper,
@@ -87,21 +84,15 @@ function insertHelperFuncs(language, allHelperNames) {
         green: greenHelper,
     };
 
-    // Add helper functions in allHelperNames
-    if (language == "JavaScript") {
-        code += "// --- Some Helper Functions -- \n";
-        allHelperNames.forEach((helperName) => {
-            if (helperName in helperFuncLookup) {
-                code += helperFuncLookup[helperName](language);
-                code += "\n";
-            } else {
-                throw `ERROR: no case for helperName: ${helperName}`;
-            }
-        });
-    } else {
-        // TODO: Add functionality for more languages
-        throw `ERROR: Language ${language} is not supported yet`;
-    }
+    // Add helper functions
+    allHelperNames.forEach((helperName) => {
+        if (helperName in helperFuncLookup) {
+            code += helperFuncLookup[helperName](language);
+            code += "\n";
+        } else {
+            throw `ERROR: no case for helperName: ${helperName}`;
+        }
+    });
 
     return code;
 }
@@ -110,10 +101,9 @@ function insertHelperFuncs(language, allHelperNames) {
 // Helper function for insertHelperFuncs
 function thresholdHelper(language) {
     // Setup
-    let code = "";
+    let code = codeComment(language, "Threshold helper function \n");
 
     if (language == "JavaScript") {
-        code += "// Threshold helper function \n";
         code +=
             "function thresholdHelper(img, type, threshold, color = 'red') { \n";
         let lines = [
@@ -122,92 +112,136 @@ function thresholdHelper(language) {
             ``,
             `// Thresh`,
             `switch (type) {`,
-            `\tcase "binary":`,
-            `\t\tcv.threshold(img, img, threshold, 255, cv.THRESH_BINARY);`,
-            `\t\tbreak;`,
-            `\tcase "adaptive":`,
-            `\t\tcv.cvtColor(img, img, cv.COLOR_BGRA2GRAY);`,
-            `\t\tcv.adaptiveThreshold(`,
-            `\t\t\timg,`,
-            `\t\t\timg,`,
-            `\t\t\t255,`,
-            `\t\t\tcv.ADAPTIVE_THRESH_GAUSSIAN_C,`,
-            `\t\t\tcv.THRESH_BINARY,`,
-            `\t\t\t11,`,
-            `\t\t\tthreshold`,
-            `\t\t);`,
-            `\t\tcv.cvtColor(img, img, cv.COLOR_GRAY2BGRA);`,
-            `\t\tbreak;`,
-            `\tcase "truncate":`,
-            `\t\tcv.threshold(img, img, threshold, 255, cv.THRESH_TRUNC);`,
-            `\t\tbreak;`,
-            `\tcase "to zero":`,
-            `\t\tcv.threshold(img, img, threshold, 255, cv.THRESH_TOZERO);`,
-            `\t\tbreak;`,
-            '\tcase "color":',
-            `\t\t// Get individual color channels`,
-            `\t\tlet rgba = new cv.MatVector();`,
-            `\t\tcv.split(img, rgba);`,
-            `\t\tlet r = rgba.get(0);`,
-            `\t\tlet g = rgba.get(1);`,
-            `\t\tlet b = rgba.get(2);`,
+            `    case "binary":`,
+            `        cv.threshold(img, img, threshold, 255, cv.THRESH_BINARY);`,
+            `        break;`,
+            `    case "adaptive":`,
+            `        cv.cvtColor(img, img, cv.COLOR_BGRA2GRAY);`,
+            `        cv.adaptiveThreshold(`,
+            `            img,`,
+            `            img,`,
+            `            255,`,
+            `            cv.ADAPTIVE_THRESH_GAUSSIAN_C,`,
+            `            cv.THRESH_BINARY,`,
+            `            11,`,
+            `            threshold`,
+            `        );`,
+            `        cv.cvtColor(img, img, cv.COLOR_GRAY2BGRA);`,
+            `        break;`,
+            `    case "truncate":`,
+            `        cv.threshold(img, img, threshold, 255, cv.THRESH_TRUNC);`,
+            `        break;`,
+            `    case "to zero":`,
+            `        cv.threshold(img, img, threshold, 255, cv.THRESH_TOZERO);`,
+            `        break;`,
+            '    case "color":',
+            `        // Get individual color channels`,
+            `        let rgba = new cv.MatVector();`,
+            `        cv.split(img, rgba);`,
+            `        let r = rgba.get(0);`,
+            `        let g = rgba.get(1);`,
+            `        let b = rgba.get(2);`,
             ``,
-            `\t\t// Set which color is chosen`,
-            `\t\tlet chosen, other1, other2;`,
-            `\t\tif (color == "red") {`,
-            `\t\t\tchosen = r;`,
-            `\t\t\tother1 = g;`,
-            `\t\t\tother2 = b;`,
-            `\t\t} else if (color == "blue") {`,
-            `\t\t\tchosen = b;`,
-            `\t\t\tother1 = g;`,
-            `\t\t\tother2 = r;`,
-            `\t\t} else {`,
-            `\t\t\tchosen = g;`,
-            `\t\t\tother1 = r;`,
-            `\t\t\tother2 = b;`,
-            `\t\t}`,
+            `        // Set which color is chosen`,
+            `        let chosen, other1, other2;`,
+            `        if (color == "red") {`,
+            `            chosen = r;`,
+            `            other1 = g;`,
+            `            other2 = b;`,
+            `        } else if (color == "blue") {`,
+            `            chosen = b;`,
+            `            other1 = g;`,
+            `            other2 = r;`,
+            `        } else {`,
+            `            chosen = g;`,
+            `            other1 = r;`,
+            `            other2 = b;`,
+            `        }`,
             ``,
-            `\t\t// Setup`,
-            `\t\tlet merged = new cv.MatVector();`,
-            `\t\tlet test1 = new cv.Mat();`,
-            `\t\tlet test2 = new cv.Mat();`,
+            `        // Setup`,
+            `        let merged = new cv.MatVector();`,
+            `        let test1 = new cv.Mat();`,
+            `        let test2 = new cv.Mat();`,
             ``,
-            `\t\t// See which pixels are threshold larger than both other1 and 2`,
-            `\t\tcv.subtract(chosen, other1, test1);`,
-            `\t\tcv.threshold(test1, test1, threshold, 255, cv.THRESH_BINARY);`,
-            `\t\tcv.subtract(chosen, other2, test2);`,
-            `\t\tcv.threshold(test2, test2, threshold, 255, cv.THRESH_BINARY);`,
-            `\t\tcv.bitwise_and(test1, test2, test1); // results go in test1`,
+            `        // See which pixels are threshold larger than both other1 and 2`,
+            `        cv.subtract(chosen, other1, test1);`,
+            `        cv.threshold(test1, test1, threshold, 255, cv.THRESH_BINARY);`,
+            `        cv.subtract(chosen, other2, test2);`,
+            `        cv.threshold(test2, test2, threshold, 255, cv.THRESH_BINARY);`,
+            `        cv.bitwise_and(test1, test2, test1); // results go in test1`,
             ``,
-            `\t\t// Place results on image`,
-            `\t\tmerged.push_back(test1);`,
-            `\t\tcv.merge(merged, img);`,
+            `        // Place results on image`,
+            `        merged.push_back(test1);`,
+            `        cv.merge(merged, img);`,
             ``,
-            `\t\t// Cleanup`,
-            `\t\tchosen.delete();`,
-            `\t\tother1.delete();`,
-            `\t\tother2.delete();`,
-            `\t\ttest1.delete();`,
-            `\t\ttest2.delete();`,
-            `\t\trgba.delete();`,
-            `\t\tmerged.delete();`,
+            `        // Cleanup`,
+            `        chosen.delete();`,
+            `        other1.delete();`,
+            `        other2.delete();`,
+            `        test1.delete();`,
+            `        test2.delete();`,
+            `        rgba.delete();`,
+            `        merged.delete();`,
             ``,
-            `\t\t// Restore image back to color`,
-            `\t\tcv.cvtColor(img, img, cv.COLOR_GRAY2BGRA);`,
+            `        // Restore image back to color`,
+            `        cv.cvtColor(img, img, cv.COLOR_GRAY2BGRA);`,
             ``,
-            `\t\tbreak;`,
-            `\tdefault:`,
-            `\t\tconsole.log("No thresh value worked");`,
-            `\t\tbreak;`,
+            `        break;`,
+            `    default:`,
+            `        console.log("No thresh value worked");`,
+            `        break;`,
             `}`,
         ];
         lines.forEach(function (line) {
             code += mh.codeLine(line);
         });
         code += "} \n";
+    } else if (language == "Python") {
+        code += "def thresholdHelper(img, Type, threshold, color = 'red'):\n";
+        code += `   # Make sure threshold isn't read as a string
+    threshold = float(threshold)
+
+    # Thresh
+    if (Type == "binary"):
+        ret, img = cv.threshold(img, threshold, 255, cv.THRESH_BINARY)
+    elif (Type == "adaptive"):
+        img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        ret, img = cv.adaptiveThreshold(img, 255,cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 11, threshold)
+        img = cv.cvtColor(img, cv.COLOR_GRAY2BGR)
+    elif (Type == "truncate"):
+        ret, img = cv.threshold(img, threshold, 255, cv.THRESH_TRUNC)
+    elif (Type == "to zero"):
+        ret, img = cv.threshold(img, threshold, 255, cv.THRESH_TOZERO)
+    elif (Type == "color"):
+        # Setup
+        b, g, r = cv.split(img)
+        if (color == 'red'):
+            chosen = r
+            other1 = g
+            other2 = b
+        elif (color == "blue"):
+            chosen = b
+            other1 = g
+            other2 = r
+        else:
+            chosen = g
+            other1 = r
+            other2 = b
+            
+        # See which pixels are threshold larger than both other1 and 2
+        test1 = cv.subtract(chosen, other1)
+        ret, test1 = cv.threshold(test1, threshold, 255, cv.THRESH_BINARY)
+        test2 = cv.subtract(chosen, other2)
+        ret, test2 = cv.threshold(test2, threshold, 255, cv.THRESH_BINARY)
+        img = cv.bitwise_and(test1, test2)
+        
+        # Restore image back to color for compatibility
+        img = cv.cvtColor(img, cv.COLOR_GRAY2BGRA)
+    else:
+        print("No thresh type worked")
+
+    return img\n`;
     } else {
-        // TODO: Add functionality for more languages
         throw `ERROR: Language ${language} is not supported yet`;
     }
 
@@ -218,16 +252,18 @@ function thresholdHelper(language) {
 // Helper function for insertHelperFuncs
 function greyscaleHelper(language) {
     // Setup
-    let code = "";
+    let code = codeComment(language, "Greyscale helper function\n");
 
     if (language == "JavaScript") {
-        code += "// Greyscale helper function\n";
         code += "function greyscaleHelper(img) {\n";
-        code += codeLine(`cv.cvtColor(img, img, cv.COLOR_BGRA2GRAY);`);
-        code += codeLine("cv.cvtColor(img, img, cv.COLOR_GRAY2BGRA);");
+        code += mh.codeLine(`cv.cvtColor(img, img, cv.COLOR_BGRA2GRAY);`);
+        code += mh.codeLine("cv.cvtColor(img, img, cv.COLOR_GRAY2BGRA);");
         code += "}\n";
+    } else if (language == "Python") {
+        code += "def greyscaleHelper(img):\n";
+        code += mh.codeLine("img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)");
+        code += mh.codeLine(`return cv.cvtColor(img, cv.COLOR_GRAY2BGR)`);
     } else {
-        // TODO: Add functionality for more languages
         throw `ERROR: Language ${language} is not supported yet`;
     }
 
@@ -238,13 +274,13 @@ function greyscaleHelper(language) {
 // Helper function for insertHelperFuncs
 function fontHelper(language) {
     // Setup
-    let code = "";
+    let code = codeComment(language, "Define font\n");
 
     if (language == "JavaScript") {
-        code += "// Define font\n";
         code += "const font = cv.FONT_HERSHEY_SIMPLEX;\n";
+    } else if (language == "Python") {
+        code += "font = cv.FONT_HERSHEY_SIMPLEX\n";
     } else {
-        // TODO: Add functionality for more languages
         throw `ERROR: Language ${language} is not supported yet`;
     }
 
@@ -254,12 +290,13 @@ function fontHelper(language) {
 // Returns code defining green for objectInGrid
 // Helper function for insertHelperFuncs
 function greenHelper(language) {
-    // Sestup
-    let code = "";
+    // Setup
+    let code = codeComment(language, "Define green\n");
 
     if (language == "JavaScript") {
-        code += "// Define green\n";
         code += "const green = new cv.Scalar(0, 255, 0, 255);\n";
+    } else if (language == "Python") {
+        code += "green = (0, 255, 0)\n";
     } else {
         // TODO: Add functionality for more languages
         throw `ERROR: Language ${language} is not supported yet`;
@@ -272,13 +309,18 @@ function greenHelper(language) {
 // Helper function for insertHelperFuncs
 function backgroundSubtractHelper(language) {
     // Setup
-    let code = "";
+    let code = codeComment(language, "Subtract Background helper\n");
+    code += codeComment(
+        language,
+        "This fgbg (foreground background) object needs to exist\n"
+    );
+    code += codeComment(
+        language,
+        "through multiple frames - so it gets defined outside of\n"
+    );
+    code += codeComment(language, "the process function\n");
 
     if (language == "JavaScript") {
-        code += "// Subtract Background helper\n";
-        code += "// This fgbg (foreground background) object needs to exist\n";
-        code += "// through multiple frames - so it gets defined outside of\n";
-        code += "// the process function\n";
         code += "// WARNING: run fgbg.delete() at the end of your program\n";
         code += "// to avoid leaking memory\n";
         code += `try {
@@ -287,8 +329,9 @@ function backgroundSubtractHelper(language) {
 
 }`;
         code += "var fgbg = new cv.BackgroundSubtractorMOG2(500, 16, true);\n";
+    } else if (language == "Python") {
+        code += "fgbg = createBackgroundSubtractorMOG2(500, 16, True)\n";
     } else {
-        // TODO: Add functionality for more languages
         throw `ERROR: Language ${language} is not supported yet`;
     }
 
@@ -299,56 +342,80 @@ function backgroundSubtractHelper(language) {
 // Helper function for insertHelperFuncs
 function circleObjectsHelper(language) {
     // Setup
-    let code = "";
+    let code = codeComment(language, "Circle objects helper function\n");
 
     if (language == "JavaScript") {
-        code += "// Circle objects helper function \n";
         code += `function circleObjectsHelper(img, max_objects, min_size, max_size) {
-\t// setup
-\tlet contours = new cv.MatVector();
-\tlet hierarchy = new cv.Mat();
-\tlet circle_list = []; // tmp empty array for holding list
+    // Setup
+    let contours = new cv.MatVector();
+    let hierarchy = new cv.Mat();
+    let circle_list = []; // tmp empty array for holding list
 
-\t// Make image greyscale (to prevent errors)
-\tcv.cvtColor(img, img, cv.COLOR_RGBA2GRAY);
+    // Make image greyscale (to prevent errors)
+    cv.cvtColor(img, img, cv.COLOR_RGBA2GRAY);
 
-\t// find contours
-\tcv.findContours(
-\t\timg,
-\t\tcontours,
-\t\thierarchy,
-\t\tcv.RETR_CCOMP,
-\t\tcv.CHAIN_APPROX_SIMPLE
-\t);
+    // Find contours
+    cv.findContours(
+        img,
+        contours,
+        hierarchy,
+        cv.RETR_CCOMP,
+        cv.CHAIN_APPROX_SIMPLE
+    );
 
-\t// Reset image to full color
-\tcv.cvtColor(img, img, cv.COLOR_GRAY2BGRA);
+    // Reset image to full color
+    cv.cvtColor(img, img, cv.COLOR_GRAY2BGRA);
 
-\t// go through contours
-\tif (contours.size() > 0) {
-\t\tfor (let i = 0; i < contours.size(); i++) {
-\t\t\t// check size
-\t\t\tvar circle = cv.minEnclosingCircle(contours.get(i));
-\t\t\tif (circle.radius >= min_size && circle.radius <= max_size) {
-\t\t\t\t// push object into our array
-\t\t\t\tcircle_list.push(circle);
-\t\t\t}
-\t\t}
+    // Go through contours
+    if (contours.size() > 0) {
+        for (let i = 0; i < contours.size(); i++) {
+            // check size
+            var circle = cv.minEnclosingCircle(contours.get(i));
+            if (circle.radius >= min_size && circle.radius <= max_size) {
+                // push object into our array
+                circle_list.push(circle);
+            }
+        }
 
-\t\t// sort results, biggest to smallest
-\t\t// code via: https://flaviocopes.com/how-to-sort-array-of-objects-by-property-javascript/
-\t\tcircle_list.sort((a, b) => (a.radius > b.radius ? -1 : 1));
-\t}
+        // sort results, biggest to smallest
+        // code via: https://flaviocopes.com/how-to-sort-array-of-objects-by-property-javascript/
+        circle_list.sort((a, b) => (a.radius > b.radius ? -1 : 1));
+    }
 
-\t// clean up
-\tcontours.delete();
-\thierarchy.delete();
+    // clean up
+    contours.delete();
+    hierarchy.delete();
         
-\t// return, from sorted list, those that match
-\treturn circle_list.slice(0, max_objects); // return the biggest ones
+    // return, from sorted list, those that match
+    return circle_list.slice(0, max_objects); // return the biggest ones
 }\n`;
+    } else if (language == "Python") {
+        code += `def circleObjectsHelper(img, max_objects, min_size, max_size):
+    # Setup
+    circle_list = []
+    
+    # Make image greyscale (to prevent errors)
+    img = cv.cvtColor(img, cv.COLOR_RGBA2GRAY)
+    ret, img = cv.threshold(img, 127, 255, cv.THRESH_BINARY)
+    
+    # Find contours
+    contours, hierarchy = cv.findContours(
+        img,
+        cv.RETR_CCOMP,
+        cv.CHAIN_APPROX_SIMPLE
+    )
+    
+    # Go through contours
+    for contour in contours:
+        center, radius = cv.minEnclosingCircle(contour)
+        if (radius >= min_size and radius <= max_size):
+            circle = {"center": center, "radius": radius}
+            circle_list.append(circle)
+    
+    # Sort list by size (biggest first) and return biggest circles
+    circle_list.sort(key=lambda circle: -(circle["radius"]))    
+    return circle_list[0:max_objects]\n`;
     } else {
-        // TODO: Add functionality for more languages
         throw `ERROR: Language ${language} is not supported yet`;
     }
 
@@ -359,37 +426,57 @@ function circleObjectsHelper(language) {
 // Helper function for insertHelperFuncs
 function drawCirclesHelper(language) {
     // Setup
-    let code = "";
+    let code = codeComment(language, "Draw circles helper function\n");
 
     if (language == "JavaScript") {
-        code += "// Draw circles helper function \n";
         code += `function drawCirclesHelper(img, circles) {
-\t//draws circle and center
-\tlet yellow_color = new cv.Scalar(255, 255, 0, 255);
-\tcircles.forEach(function (circle) {
-\t\t// Draws circle
-\t\tcv.circle(img, circle.center, circle.radius, yellow_color, 2);
-\t\t cv.circle(img, circle.center, 1, yellow_color, 1);
+    //draws circle and center
+    let yellow_color = new cv.Scalar(255, 255, 0, 255);
+    circles.forEach(function (circle) {
+        // Draws circle
+        cv.circle(img, circle.center, circle.radius, yellow_color, 2);
+        cv.circle(img, circle.center, 1, yellow_color, 1);
 
-\t\t// Draws radius
-\t\tlet font = cv.FONT_HERSHEY_SIMPLEX;
-\t\tcv.putText(
-\t\t\timg,
-\t\t\tMath.round(circle.radius).toString(),
-\t\t\t{
-\t\t\t\tx: circle.center.x - circle.radius,
-\t\t\t\ty: circle.center.y + circle.radius,
-\t\t\t},
-\t\t\tfont,
-\t\t\t0.5,
-\t\t\tyellow_color,
-\t\t\t2,
-\t\t\tcv.LINE_AA
-\t\t);
-\t});
+        // Draws radius
+        let font = cv.FONT_HERSHEY_SIMPLEX;
+        cv.putText(
+            img,
+            Math.round(circle.radius).toString(),
+            {
+                x: circle.center.x - circle.radius,
+                y: circle.center.y + circle.radius,
+            },
+            font,
+            0.5,
+            yellow_color,
+            2,
+            cv.LINE_AA
+        );
+    });
 }\n`;
+    } else if (language == "Python") {
+        code += `def drawCirclesHelper(img, circles):
+    yellow = (0, 255, 255)
+    for circle in circles:
+        # Draw circle & Center
+        cv.circle(img, circle["center"], circle["radius"], yellow, 2) #NOT SURE
+        cv.circle(img, circle["center"], 1, yellow, 1)
+        
+        # Write radius
+        font = cv.FONT_HERSHEY_SIMPLEX
+        cv.putText(
+            img,
+            str(round(circle["radius"])),
+            ((circle["center"][0] - circle["radius"]), (circle["center"][1] + circle["radius"])),
+            font,
+            0.5,
+            yellow,
+            2,
+            cv.LINE_AA
+        )
+        
+    return img\n`;
     } else {
-        // TODO: Add functionality for more languages
         throw `ERROR: Language ${language} is not supported yet`;
     }
 
@@ -410,18 +497,41 @@ function makeFunction(language, toInsert, test = false) {
         } else {
             code += `function processImage(img) {\n`;
         }
-        code += `\t// Setup
-\tlet outputs = {};
-\tconst input_width = 320; // Change to fit video
-\tconst input_height = 240; // canvas dimensions
+        code += `    // Setup
+    let outputs = {};
+    const input_width = 320; // Change to fit video
+    const input_height = 240; // canvas dimensions
+
 ${toInsert}
-\t// Return outputs of sub functions
-\treturn outputs;
+    // Return outputs of sub functions
+    return outputs;
 }`;
+    } else if (language == "Python") {
+        code += `# Takes in variable containing openCV image and returns
+# a tuple of its modified version and outputs (img, outputs)
+def processImage(img):
+    # Setup
+    outputs = {}
+    input_width = 320 # Change to fit your
+    input_height = 240 # video dimensions
+    
+${toInsert}
+    # Return outputs of sub functions
+    return img, outputs
+`;
     } else {
-        // TODO: Add functionality for more languages
         throw `ERROR: Language ${language} is not supported yet`;
     }
 
     return code;
+}
+
+function codeComment(language, code) {
+    if (language == "JavaScript") {
+        return `// ${code}`;
+    } else if (language == "Python") {
+        return `# ${code}`;
+    } else {
+        throw `ERROR: Language ${language} is not supported yet`;
+    }
 }

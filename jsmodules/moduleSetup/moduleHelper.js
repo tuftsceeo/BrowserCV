@@ -38,7 +38,7 @@ export function displayInterface(destinationElement, id, HTMLcode) {
 
 // Formats a line of code for generateCode functions
 export function codeLine(code) {
-    return `\t${code}\n`;
+    return `    ${code}\n`;
 }
 
 // Copies value of passed id to clipboard

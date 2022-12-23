@@ -17,10 +17,6 @@ h1 {
     color: #536dcb;
 }
 
-ul {
-    columns: 2;
-}
-
 topnav ul {
     list-style-type: none;
     margin: 0;
@@ -29,6 +25,7 @@ topnav ul {
     padding: 1.5%;
     display: inline-block;
     width: 100%;
+    columns: 2;
 }
 
 .navbar-brand {
@@ -47,8 +44,8 @@ blockquote {
 }
 
 .index-title {
-    padding-top: 30px;
-    padding-bottom: 30px;
+    padding-top: 1%;
+    padding-bottom: 1%;
 }
 
 .input-sm {
@@ -97,4 +94,31 @@ textarea,
 
 .row-help-subsection {
     padding-top: 2%;
+}
+
+div.sticky {
+    position: -webkit-sticky; /* Safari */
+    position: sticky;
+    top: 1%;
+}
+
+.help-toc {
+    padding-top: 4%;
+}
+
+.tool-buttons {
+    background-color: rgb(255, 255, 255);
+    border-bottom: 1px solid rgba(135, 127, 127, 0.716);
+    border-top: 1px solid rgba(135, 127, 127, 0.716);
+    border-radius: 30px;
+    margin-left: 5%;
+    margin-right: 5%;
+}
+
+.col-left-padding-lg {
+    padding-left: 5%;
+}
+
+.col-right-padding-lg {
+    padding-right: 5%;
 }

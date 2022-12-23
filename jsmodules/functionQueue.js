@@ -69,9 +69,6 @@ class FunctionQueue {
         let divToRemove = document.getElementById(id);
         divToRemove.remove();
         console.log("removed", temp["name"]);
-
-        // Updates UI
-        checkBottomButtonVisibility();
     }
 
     // Takes last function off queue and returns a copy of it
@@ -79,9 +76,6 @@ class FunctionQueue {
         // Creates deep copy
         let temp = this.functions.pop();
         this.length--;
-
-        // Updates UI
-        checkBottomButtonVisibility();
 
         return temp;
     }
@@ -93,9 +87,6 @@ class FunctionQueue {
             let divToRemove = document.getElementById(temp["id"]);
             divToRemove.remove();
             console.log("Removed:", temp["name"]);
-
-            // Updates UI
-            checkBottomButtonVisibility();
         }
     }
 
