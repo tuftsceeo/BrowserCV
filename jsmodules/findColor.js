@@ -200,6 +200,7 @@ class FindColor {
             throw `Language: ${language} not currently supported`;
         }
 
+        // Format each code line
         lines.forEach((line) => {
             code += mh.codeLine(line);
         });

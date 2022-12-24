@@ -178,13 +178,13 @@ class ObjectInGrid {
         }
     }
 
-    // TODO:
     generateCode(language) {
         // Setup
         let code = "";
+        let lines = "";
 
         if (language == "JavaScript") {
-            let lines = [`const ${this.id}gridValues = [`];
+            lines = [`const ${this.id}gridValues = [`];
 
             // Hardcoding in gridValues
             let insertArrayText = [];
@@ -194,11 +194,11 @@ class ObjectInGrid {
             lines = lines.concat(insertArrayText);
 
             lines = lines.concat([
-                `]`,
+                `];`,
                 ``,
                 `// Add points for grid squares objects are in`,
                 `const ${this.id}hSpacing = input_width / ${this.gridWidth};`,
-                `const ${this.id}vSpacing = input_height / ${this.gridHeight}`,
+                `const ${this.id}vSpacing = input_height / ${this.gridHeight};`,
             ]);
 
             // If function isn't looking at another's output, don't include code
@@ -268,12 +268,94 @@ class ObjectInGrid {
                 `    }`,
                 `}`,
             ]);
-            lines.forEach((line) => {
-                code += mh.codeLine(line);
+        } else if (language == "Python") {
+            lines = [`${this.id}gridValues = [`];
+
+            // Hardcoding in gridValues
+            let insertArrayText = [];
+            this.gridValues.forEach((line) => {
+                insertArrayText.push(`    [${line}],`);
             });
+            lines = lines.concat(insertArrayText);
+
+            lines = lines.concat([
+                `]`,
+                ``,
+                `# Add points for grid squares objects are in`,
+                `${this.id}hSpacing = int(input_width / ${this.gridWidth})`,
+                `${this.id}vSpacing = int(input_height / ${this.gridHeight})`,
+            ]);
+
+            // If function isn't looking at another's output, don't include code
+            if (this.outputFromId) {
+                lines = lines.concat([
+                    `outputs${this.id} = outputs["${this.outputFromId}"]`,
+                    `outputs["${this.id}"] = 0;`,
+                    `if (outputs${this.id}):`,
+                    `    for circle in outputs${this.id}:`,
+                    `        hGridIdx = int(np.floor(circle["center"][0] / ${this.id}hSpacing))`,
+                    `        vGridIdx = int(np.floor(circle["center"][1] / ${this.id}vSpacing))`,
+                    `        if (((hGridIdx >= 0) and (hGridIdx < ${this.gridWidth})) and ((vGridIdx >= 0) and (vGridIdx < ${this.gridHeight}))):`,
+                    `           outputs["${this.id}"] += float(${this.id}gridValues[vGridIdx][hGridIdx])`,
+                    ``,
+                ]);
+            }
+
+            // Drawing grid code runs regardless
+            lines = lines.concat([
+                `# Draw grid`,
+                `for i in range(0, ${this.gridHeight}):`,
+                `   # Draw horizontal lines`,
+                `   cv.line(`,
+                `           img,`,
+                `           (0, i * ${this.id}vSpacing),`,
+                `           (input_width, i * ${this.id}vSpacing),`,
+                `           green,`,
+                `           1,`,
+                `           cv.LINE_AA,`,
+                `           0`,
+                `          )`,
+                ``,
+                `for i in range(0, ${this.gridWidth}):`,
+                `    # Draw vertical lines`,
+                `    cv.line(`,
+                `        img,`,
+                `        (i * ${this.id}hSpacing, 0),`,
+                `        (i * ${this.id}hSpacing, input_height),`,
+                `        green,`,
+                `        1,`,
+                `        cv.LINE_AA,`,
+                `        0`,
+                `    )`,
+                ``,
+                `# Write value on grid`,
+                `for i in range(0, ${this.gridHeight}):`,
+                `   for j in range(0, ${this.gridWidth}):`,
+                `        value = str(${this.id}gridValues[i][j])`,
+                `        xPadding = len(value) * 10`,
+                `        cv.putText(`,
+                `            img,`,
+                `            value,`,
+                `            (`,
+                `                (j + 1) * ${this.id}hSpacing - xPadding,`,
+                `                (i + 1) * ${this.id}vSpacing - 5`,
+                `            ),`,
+                `            font,`,
+                `            0.5,`,
+                `            green,`,
+                `            2,`,
+                `            cv.LINE_AA`,
+                `        )`,
+                ``,
+            ]);
         } else {
             throw `Language: ${language} not currently supported`;
         }
+
+        // Format each code line
+        lines.forEach((line) => {
+            code += mh.codeLine(line);
+        });
 
         return {
             code: code,

@@ -2,7 +2,7 @@
  * TODO: Bugs
  * - onImageActions.circleObjects makes the image black and white. Should deep
  *   copy the image, then make the copy black and white, then do actions, then
- *   return the circles, not modify original image
+ *   return the circles, not modify original image (JS only)
  *
  * TODO: Improve Help with example tutorials
  * - For example certain combinations of functions that do:
@@ -10,9 +10,6 @@
  *          - Using either 0.1 and 1.1 or 2 functions
  *      - Detect where object is in 3x3 using 1-9
  *      - etc.
- *
- * TODO: Improve functionality of FunctionQueue
- * - Swap two functions
  *
  * TODO: Add more functions:
  * - Something using the radius of an object to find its size

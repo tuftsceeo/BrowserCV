@@ -397,7 +397,6 @@ function circleObjectsHelper(language) {
     
     # Make image greyscale (to prevent errors)
     img = cv.cvtColor(img, cv.COLOR_RGBA2GRAY)
-    ret, img = cv.threshold(img, 127, 255, cv.THRESH_BINARY)
     
     # Find contours
     contours, hierarchy = cv.findContours(
@@ -461,9 +460,9 @@ function drawCirclesHelper(language) {
     for circle in circles:
         # Draw circle & center
         # center and radius need to be a tuple of integers, and an integer
-        circle["center"] = (int(circle["center"][0]), int(circle["center"][0]))
+        circle["center"] = (int(circle["center"][0]), int(circle["center"][1]))
         circle["radius"] = int(circle["radius"])
-        cv.circle(img, circle["center"], circle["radius"], yellow, 2) #NOT SURE
+        cv.circle(img, circle["center"], circle["radius"], yellow, 2)
         cv.circle(img, circle["center"], 1, yellow, 1)
         
         # Write radius
