@@ -95,24 +95,22 @@ export function greyscale(img) {
 // Function which finds and returns max_objects number of minimum enclosing circles around contours in img_in whose radii are between min_size and max_size
 export function circleObjects(img, max_objects, min_size, max_size) {
     // setup
+    let tmp_img = img.clone(); // So we don't affect the original img
     let contours = new cv.MatVector();
     let hierarchy = new cv.Mat();
     let circle_list = []; // tmp empty array for holding list
 
-    // Make image greyscale (to prevent errors)
-    cv.cvtColor(img, img, cv.COLOR_RGBA2GRAY);
+    // Make image greyscale (needs to be for findContours)
+    cv.cvtColor(tmp_img, tmp_img, cv.COLOR_RGBA2GRAY);
 
     // find contours
     cv.findContours(
-        img,
+        tmp_img,
         contours,
         hierarchy,
         cv.RETR_CCOMP,
         cv.CHAIN_APPROX_SIMPLE
     );
-
-    // Reset image to full color
-    cv.cvtColor(img, img, cv.COLOR_GRAY2BGRA);
 
     // go through contours
     if (contours.size() > 0) {

@@ -348,24 +348,22 @@ function circleObjectsHelper(language) {
     if (language == "JavaScript") {
         code += `function circleObjectsHelper(img, max_objects, min_size, max_size) {
     // Setup
+    let tmp_img = img.clone(); // So we don't affect the original img
     let contours = new cv.MatVector();
     let hierarchy = new cv.Mat();
     let circle_list = []; // tmp empty array for holding list
 
     // Make image greyscale (to prevent errors)
-    cv.cvtColor(img, img, cv.COLOR_RGBA2GRAY);
+    cv.cvtColor(tmp_img, tmp_img, cv.COLOR_RGBA2GRAY);
 
     // Find contours
     cv.findContours(
-        img,
+        tmp_img,
         contours,
         hierarchy,
         cv.RETR_CCOMP,
         cv.CHAIN_APPROX_SIMPLE
     );
-
-    // Reset image to full color
-    cv.cvtColor(img, img, cv.COLOR_GRAY2BGRA);
 
     // Go through contours
     if (contours.size() > 0) {
@@ -512,11 +510,9 @@ ${toInsert}
     } else if (language == "Python") {
         code += `# Takes in variable containing openCV image and returns
 # a tuple of its modified version and outputs (img, outputs)
-def processImage(img):
+def processImage(img, input_width, input_height):
     # Setup
     outputs = {}
-    input_width = 320 # Change to fit your
-    input_height = 240 # video dimensions
     
 ${toInsert}
     # Return outputs of sub functions

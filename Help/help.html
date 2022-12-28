@@ -144,10 +144,153 @@ img.delete();</code>
                                 </p>  
                             </div>
 
-                            <!-- HTML & JS -->
+                            <!-- Python -->
                             <div class="row row-help-subsection">
                                 <h5 id="python">Python</h5>
+                                <p>
+                                    To use an image processing function in Python, first you need to download the OpenCV-Python library. I won't go into the details too much here, but if not using a Python environment (like <a href="https://blog.hubspot.com/website/anaconda-python">Anaconda</a>), <a href="https://docs.opencv.org/4.x/d5/de5/tutorial_py_setup_in_windows.html">this tutorial</a> contains the basics.
+                                </p>
+                                <p>
+                                    Next, import the OpenCV module using:
+                                    <div class="code-highlight">
+                                        <pre>
+                                            <code>
+import cv2 as cv
+print(cv.__version__) # Currently 4.5.5
+# Other useful packages for working with OpenCV, but not needed
+# import numpy as np
+# import matplotlib as mpl
+# import matplotlib.pyplot as plt
+# import sys
+# import os
+</code>
+                                        </pre>
+                                    </div>
+                                </p>
+                                <p>
+                                    Then, define your image processing function (copied from <a href="../Generate Code Tool/tool.html">the tool</a>):
+                                    <div class="code-highlight">
+                                        <pre>
+                                            <code>
+# Takes in variable containing openCV image and returns
+# a tuple of its modified version and outputs (img, outputs)
+def processImage(img, input_width, input_height):
+    # Setup
+    outputs = {}
+    
+    # --- The tool will generate more code here! ---
+
+    # Return outputs of sub functions
+    return img, outputs
+</code>
+                                        </pre>
+                                    </div>
+                                </p>
+                                <p>
+                                    Next, you'll want to start a video capture. The method below worked for connecting to my webcam and displaying output to a new window on my PC, but may not work in all cases. More information for capturing a video input can be found <a href="https://docs.opencv.org/3.4/d8/dfe/classcv_1_1VideoCapture.html#details">here</a>.
+                                    <div class="code-highlight">
+                                        <pre>
+                                            <code>
+# Setup
+input_width = 320 # Change to fit your
+input_height = 240 # video dimensions
+
+# Get video
+cap = cv.VideoCapture(0)
+cap.set(cv.CAP_PROP_FRAME_WIDTH, input_width)
+cap.set(cv.CAP_PROP_FRAME_HEIGHT, input_height)
+
+# Check if it opened
+if not cap.isOpened():
+    print("Can't open camera")
+    exit()</code>
+                                        </pre>
+                                    </div>
+                                </p>
+                                <p>
+                                    You can check the width and height of your output code using these commands:
+                                    <div class="code-highlight">
+                                        <pre>
+                                            <code>
+print(cap.get(cv.CAP_PROP_FRAME_WIDTH))
+print(cap.get(cv.CAP_PROP_FRAME_HEIGHT))</code>
+                                        </pre>
+                                    </div>
+                                </p>
+                                <p>
+                                    Now we're ready to apply our image processing function! The script below displays the post-processed image to a new window on my desktop and prints the outputs of all my functions in Python. Pressing 'q' on a keyboard closes the window and exits the program. This script outline shows how to use the image processing function generated from <a href="../Generate Code Tool/tool.html">the tool</a>.
+                                    <div class="code-highlight">
+                                        <pre>
+                                            <code>
+keep_going = True
+while keep_going:
+    # Capture frame-by-frame
+    worked, frame = cap.read() # Frame contains the image.
+                               # If frame is read correctly, then
+                               # worked (a boolean) is True
+    
+    if worked:
+        # Apply our image processing function
+        frame, outputs = processImage(frame, input_width, input_height)
+        
+        # Here I'm just showing the image,
+        # but you could do more with it
+        cv.imshow('frame', frame)
+        
+        # Here I'm just printing outputs,
+        # but you could do more with this as well
+        print(outputs)
+        
+        # Here I have an exit condition
+        # When the 'q' key is pressed, everything stops
+        if cv.waitKey(100) == ord('q'):
+            keep_going = False
+    else:
+        print("Can't receive frame (stream end?). Exiting ...")
+        keep_going = False
+</code>
+                                        </pre>
+                                    </div>
+                                </p>
+                                <p>
+                                    Finally, we clean up our script, making sure all windows are closed and we close the capture correctly
+                                    <div class="code-highlight">
+                                        <pre>
+                                            <code>
+# Clean up
+cap.release() # Lets other apps use your webcam
+cv.destroyAllWindows() # Exits the window Python opens</code>
+                                        </pre>
+                                    </div>
+                                </p>
+
                             </div>
+
+                        <!-- Examples -->
+                        <div class="row row-help-section">
+                            <h3 id="examples">Examples</h3>
+                            <div>
+                                <h5 id="left_or_right">Left or Right</h5>
+                                <p>
+                                    One possible image processing function that can be generated using this tool will determine if an object of a certain color is on the left or the right half of the screen. For this example, we'll be looking for a red circle.
+                                </p>
+                                <p>
+                                    First, we'll use a threshold function to look for objects which are more red than they are other colors. This will help us block out bright white objects. Click the "Add threshold" button, make sure the type is binary, and adjust the slider until your object looks red and other (non-red) objects don't.
+                                </p>
+                                <p>
+                                    Next, we'll look for a red object by adding a "find color" step using the "Add find color" button on the tool. Set the color to find to be red, the maximum number of objects to look for to be 1, and make sure the visualize circles box is checked. Hold the red object in front of your camera and adjust the brightness, minimum size, and maximum size settings until the function correctly circles the red object and doesn't circle any other objects. Increasing the minimum size may help stop small noise fluctuations from being identified as an object.
+                                </p>
+                                <p>
+                                    Lastly, click the "Add is object in grid" button to add a step looking for where an object is on the image. Set the "use output from" box to be the ID of the findColor step we just added and pick a grid width of 2 and height of 1. Have the function add 1 to the total if the object is in the left grid box, and -1 if it's in the right.
+                                </p>
+                                <p>
+                                    Observe the number next to total at the bottom of the "is object in grid" function. If the object is on the left side of the image, the total will be 1. If it's on the right, the total will be -1. If the object is not visible, the total will be 0.
+                                </p>
+                                <p>
+                                    Finally, select which language you're using and click "generate code" at the bottom of the website. Copy and paste the results into your program. You can access the total generated in the last step by looking in the "outputs" object generated by the processImage function under the ID of the "is object in grid" step. 
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
@@ -167,6 +310,11 @@ img.delete();</code>
                                         <ul>
                                             <li><a href="#html">HTML & JavaScript</a></li>
                                             <li><a href="#python">Python</a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a href="#examples">Examples</a>
+                                        <ul>
+                                            <li><a href="#left_or_right">Left or Right</a></li>
                                         </ul>
                                     </li>
                                 </ul>

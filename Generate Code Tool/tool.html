@@ -112,7 +112,7 @@
                         <div class="row row-vert-padding-sm">
                             <div class="col">
                                 <input class="input-sm" value="15" id="fps" type="number"/>
-                                <label for="fps" style="padding-left: 1em;">Render FPS (lower for better performance)</label>
+                                <label for="fps" style="padding-left: 1em;">How many frames to process per second (lower for better performance)</label>
                             </div>
                         </div>
                         <div class="row">
@@ -174,7 +174,8 @@
                                 <option value="Python">Python</option>
                             </select>
                             <button id="output_copy" onclick="copyToClip('output_code', 'output_copy', 'generateCodeButtons');">Copy</button>
-                            <button id="testCode" onclick="testCode();">Test</button>
+                            <!-- For Debugging -->
+                            <!-- <button id="testCode" onclick="testCode();">Test</button>  -->
                         </div>
                 </div>
             </div>
@@ -193,8 +194,7 @@
                 </div>
             </div>
             <!-- For Debugging -->
-            <div id="showTestImgs">
-            </div>
+            <!-- <div id="showTestImgs"> </div> -->
         </div>
     </body>
 </html>
