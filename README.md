@@ -25,7 +25,7 @@ Holds previously developed versions of the page
 
 #### Scripts
 ##### **```Generate Code Tool/processingv2.js```**
-The main JavaScript driver for the application. It imports other JavaScript modules, loads page data, adds buttons to the page depending on which processing functions exist, handles video capture, processing, and playback, and also contains developer to-do list.
+The main JavaScript driver for the application. It imports other JavaScript modules, loads page data, adds buttons to the page depending on which processing functions exist, and handles video capture, processing, and playback.
 ##### **```jsmodules/*.js```**
 Contains JavaScript modules representing each image processing function the tool can do. Each module exports certain pieces of information and functions including their name, how to render their interface on the page, and a class which stores relevant information to each instance of the module's function, as well as members which apply the function to an image and generate the code for that function in multiple languages. In order to be considered valid, each of these exports much exist, and they are checked in ```processingv2.js```. These modules also load their interfaces from html files in the ```Function Interfaces``` folder.
 ##### **```jsmodules/functionQueue.js```**

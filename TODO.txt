@@ -1,0 +1,15 @@
+Developer To Do list
+
+Add more functions
+- Something that uses the radius of an object to find its size
+- Erasing everything insdie or outside of an object circle using mask
+
+CSS + Design
+- Improve accessibility
+- Make the code text box resizable
+- Drag and drop functionality?
+- (Mobile) Make the hamburger work in the navbar
+
+About Page
+- Privacy policy (we don't collect data)
+- License (MIT? Apache?)

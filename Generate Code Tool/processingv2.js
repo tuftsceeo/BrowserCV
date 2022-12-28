@@ -1,20 +1,5 @@
-/**
- *
- * TODO: Add more functions:
- * - Something using the radius of an object to find its size
- * - Erase everything outside/inside object circles (using mask)
- *
- * TODO: CSS + Design
- * - improve accessibility
- * - Have canvas move as you scroll?
- * - resizable text box?
- * - drag and drop?
- * - Make mobile hamburger thing work in navbar
- *
- * TODO: About page?
- * - Privacy policy (just saying we don't collect data?)
- * - License? (MIT? Apache?)
- *
+/*
+ * The main JavaScript driver for the tool
  */
 
 "use strict";
