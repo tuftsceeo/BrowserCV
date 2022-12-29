@@ -148,7 +148,7 @@ img.delete();</code>
                             <div class="row row-help-subsection">
                                 <h5 id="python">Python</h5>
                                 <p>
-                                    To use an image processing function in Python, first you need to download the OpenCV-Python library. I won't go into the details too much here, but if not using a Python environment (like <a href="https://blog.hubspot.com/website/anaconda-python">Anaconda</a>), <a href="https://docs.opencv.org/4.x/d5/de5/tutorial_py_setup_in_windows.html">this tutorial</a> contains the basics.
+                                    To use an image processing function in Python, first you need to download the OpenCV-Python library. <a href="https://docs.opencv.org/4.x/d5/de5/tutorial_py_setup_in_windows.html">This tutorial</a> contains the basics unless you're using a Python environment (like <a href="https://blog.hubspot.com/website/anaconda-python">Anaconda</a>), in which case follow the steps from that environment to install OpenCV-Python.
                                 </p>
                                 <p>
                                     Next, import the OpenCV module using:
@@ -187,7 +187,7 @@ def processImage(img, input_width, input_height):
                                     </div>
                                 </p>
                                 <p>
-                                    Next, you'll want to start a video capture. The method below worked for connecting to my webcam and displaying output to a new window on my PC, but may not work in all cases. More information for capturing a video input can be found <a href="https://docs.opencv.org/3.4/d8/dfe/classcv_1_1VideoCapture.html#details">here</a>.
+                                    Next, you'll want to start a video capture. This method works for capturing video from a webcam and displaying it as a desktop window. More information for capturing a video input can be found <a href="https://docs.opencv.org/3.4/d8/dfe/classcv_1_1VideoCapture.html#details">here</a>.
                                     <div class="code-highlight">
                                         <pre>
                                             <code>
@@ -218,7 +218,7 @@ print(cap.get(cv.CAP_PROP_FRAME_HEIGHT))</code>
                                     </div>
                                 </p>
                                 <p>
-                                    Now we're ready to apply our image processing function! The script below displays the post-processed image to a new window on my desktop and prints the outputs of all my functions in Python. Pressing 'q' on a keyboard closes the window and exits the program. This script outline shows how to use the image processing function generated from <a href="../Generate Code Tool/tool.html">the tool</a>.
+                                    Now it's time to apply our image processing function. The script below displays the post-processed image to a new desktop window and prints all the outputs in Python. Pressing 'q' on a keyboard closes the window and exits the script. This script outline shows how to use the image processing function generated from <a href="../Generate Code Tool/tool.html">the tool</a>.
                                     <div class="code-highlight">
                                         <pre>
                                             <code>
@@ -253,7 +253,7 @@ while keep_going:
                                     </div>
                                 </p>
                                 <p>
-                                    Finally, we clean up our script, making sure all windows are closed and we close the capture correctly
+                                    Finally, the script cleans up, making sure all windows are closed and we close the capture correctly.
                                     <div class="code-highlight">
                                         <pre>
                                             <code>
@@ -278,13 +278,23 @@ cv.destroyAllWindows() # Exits the window Python opens</code>
                                     First, we'll use a threshold function to look for objects which are more red than they are other colors. This will help us block out bright white objects. Click the "Add threshold" button, make sure the type is binary, and adjust the slider until your object looks red and other (non-red) objects don't.
                                 </p>
                                 <p>
+                                    <img src="left_or_right_example_threshold.png" alt="Adding a threshold step" class="help-img">
+                                </p>
+                                <p>
                                     Next, we'll look for a red object by adding a "find color" step using the "Add find color" button on the tool. Set the color to find to be red, the maximum number of objects to look for to be 1, and make sure the visualize circles box is checked. Hold the red object in front of your camera and adjust the brightness, minimum size, and maximum size settings until the function correctly circles the red object and doesn't circle any other objects. Increasing the minimum size may help stop small noise fluctuations from being identified as an object.
+                                </p>
+                                <p>
+                                    <img src="left_or_right_example_find_color.png" alt="Adding a find color step" class="help-img">
                                 </p>
                                 <p>
                                     Lastly, click the "Add is object in grid" button to add a step looking for where an object is on the image. Set the "use output from" box to be the ID of the findColor step we just added and pick a grid width of 2 and height of 1. Have the function add 1 to the total if the object is in the left grid box, and -1 if it's in the right.
                                 </p>
+                                    <img src="left_or_right_example_object_in_grid.png" alt="Adding an 'is object in grid' step" class="help-img">
                                 <p>
                                     Observe the number next to total at the bottom of the "is object in grid" function. If the object is on the left side of the image, the total will be 1. If it's on the right, the total will be -1. If the object is not visible, the total will be 0.
+                                </p>
+                                <p>
+                                    <img src="left_or_right_example_total.png" alt="Where to find the total generated" class="help-img">
                                 </p>
                                 <p>
                                     Finally, select which language you're using and click "generate code" at the bottom of the website. Copy and paste the results into your program. You can access the total generated in the last step by looking in the "outputs" object generated by the processImage function under the ID of the "is object in grid" step. 

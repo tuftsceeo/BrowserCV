@@ -122,3 +122,10 @@ div.sticky {
 .col-right-padding-lg {
     padding-right: 5%;
 }
+
+.help-img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 75%;
+}
