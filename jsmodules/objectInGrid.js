@@ -432,6 +432,7 @@ function updateGrid(gridTab, gridWidth, gridHeight, id) {
         // Remove excess rows
         for (let i = gridTab.rows.length; i > gridHeight; i--) {
             gridTab.removeChild(gridTab.rows[i - 1]);
+            functionQueue.functionWithID(id).params.gridValues.pop();
         }
     } else if (gridWidth < gridTab.rows[0].cells.length) {
         // remove excess cols
@@ -439,6 +440,7 @@ function updateGrid(gridTab, gridWidth, gridHeight, id) {
             let row = gridTab.rows[i];
             for (let i = row.cells.length; i > gridWidth; i--) {
                 row.removeChild(row.cells[i - 1]);
+                functionQueue.functionWithID(id).params.gridValues[i].pop();
             }
         }
     } else if (gridWidth > gridTab.rows[0].cells.length) {
