@@ -406,6 +406,7 @@ function updateGrid(gridTab, gridWidth, gridHeight, id) {
         input.min = 0;
         input.style = "width: 5em;";
         box.appendChild(input);
+        functionQueue.functionWithID(id).params.gridValues[i][j] = 1;
         input.addEventListener("input", function () {
             functionQueue.functionWithID(id).params.gridValues[i][j] = Number(
                 input.value
@@ -414,7 +415,7 @@ function updateGrid(gridTab, gridWidth, gridHeight, id) {
         return box;
     };
 
-    // Checks what the change is. If user deletes entry, table doesn't chang
+    // Checks what the change is. If user deletes entry, table doesn't change
     if (gridWidth === "" || gridHeight === "") {
         return;
     } else if (!gridTab.firstChild) {
@@ -453,6 +454,7 @@ function updateGrid(gridTab, gridWidth, gridHeight, id) {
         for (let i = gridTab.rows.length; i < gridHeight; i++) {
             let row = document.createElement("tr");
             row.id = `${id}row${i}`;
+            functionQueue.functionWithID(id).params.gridValues[i] = Array();
             for (let j = 0; j < gridWidth; j++) {
                 row.appendChild(createBox(i, j, id));
             }

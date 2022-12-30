@@ -1,5 +1,9 @@
 Developer To Do list
 
+Functionality
+- Swap two steps in queue
+  - Both swap in functionQueue and on page
+
 Add more functions
 - Something that uses the radius of an object to find its size
 - Erasing everything insdie or outside of an object circle using mask
